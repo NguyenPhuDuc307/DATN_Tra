@@ -43,6 +43,23 @@
                                 <span asp-validation-for="ProductCategoryId" class="text-danger"></span>
                             </div>
                             <div class="mb-3">
+                                <label asp-for="SupplierId" class="form-label">Nhà cung cấp</label>
+                                <select asp-for="SupplierId" class="form-select" asp-items="ViewBag.Suppliers"
+                                    id="supplierId">
+                                    <option value="">-- Chọn nhà cung cấp --</option>
+                                </select>
+                                <span asp-validation-for="SupplierId" class="text-danger"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="DefaultSupplierId" class="form-label">Nhà cung cấp mặc định</label>
+                                <select asp-for="DefaultSupplierId" class="form-select" asp-items="ViewBag.Suppliers"
+                                    id="defaultSupplierId">
+                                    <option value="">-- Chọn nhà cung cấp mặc định --</option>
+                                </select>
+                                <span asp-validation-for="DefaultSupplierId" class="text-danger"></span>
+                                <small class="form-text text-muted">Nhà cung cấp mặc định khi tạo đơn mua hàng</small>
+                            </div>
+                            <div class="mb-3">
                                 <label asp-for="Description" class="form-label">Mô tả</label>
                                 <textarea asp-for="Description" class="form-control" rows="3"></textarea>
                                 <span asp-validation-for="Description" class="text-danger"></span>
@@ -134,6 +151,16 @@
             // Gọi hàm khi người dùng thay đổi checkbox
             $("#isService").change(function () {
                 toggleStockFields();
+            });
+
+            // Xử lý khi chọn nhà cung cấp
+            $("#supplierId").change(function () {
+                var selectedValue = $(this).val();
+
+                // Nếu chưa có nhà cung cấp mặc định được chọn, tự động chọn nhà cung cấp mặc định
+                if (!$("#defaultSupplierId").val()) {
+                    $("#defaultSupplierId").val(selectedValue);
+                }
             });
         });
     </script>

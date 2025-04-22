@@ -53,6 +53,72 @@ namespace DehaAccountingMvc.Controllers
             return View(purchaseOrder);
         }
 
+        // GET: PurchaseOrders/CreateForProduct
+        public async Task<IActionResult> CreateForProduct(int? productId)
+        {
+            if (productId == null)
+            {
+                return RedirectToAction(nameof(Create));
+            }
+
+            var product = await _context.Products.FindAsync(productId);
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            // Tạo mã đơn hàng tự động format: PO-yyyyMMdd-nnn
+            string prefix = "PO-" + DateTime.Now.ToString("yyyyMMdd");
+
+            // Tìm số thứ tự lớn nhất trong ngày
+            var lastOrder = await _context.PurchaseOrders
+                .Where(p => p.OrderNumber.StartsWith(prefix))
+                .OrderByDescending(p => p.OrderNumber)
+                .FirstOrDefaultAsync();
+
+            int sequenceNumber = 1;
+            if (lastOrder != null)
+            {
+                string sequencePart = lastOrder.OrderNumber.Substring(prefix.Length + 1);
+                if (int.TryParse(sequencePart, out int lastSequence))
+                {
+                    sequenceNumber = lastSequence + 1;
+                }
+            }
+
+            var purchaseOrder = new PurchaseOrder
+            {
+                OrderNumber = $"{prefix}-{sequenceNumber:D3}",
+                OrderDate = DateTime.Now,
+                Status = PurchaseOrderStatus.New,
+                Notes = $"Tạo tự động cho sản phẩm {product.Name} (tồn kho thấp)"
+            };
+
+            // Thiết lập nhà cung cấp mặc định nếu sản phẩm có nhà cung cấp mặc định
+            if (product.DefaultSupplierId.HasValue)
+            {
+                purchaseOrder.SupplierId = product.DefaultSupplierId.Value;
+            }
+
+            await PrepareDropdownLists(purchaseOrder);
+
+            // Truyền thông tin sản phẩm để tự động thêm vào form
+            ViewBag.PreselectedProduct = new
+            {
+                product.Id,
+                product.Name,
+                product.ProductCode,
+                product.PurchasePrice,
+                product.Unit,
+                product.StockQuantity,
+                product.IsService,
+                product.WarehouseLocation,
+                RecommendedQuantity = Math.Max(20 - product.StockQuantity, 10) // Đề xuất số lượng đặt hàng
+            };
+
+            return View("Create", purchaseOrder);
+        }
+
         // GET: PurchaseOrders/Create
         public async Task<IActionResult> Create()
         {

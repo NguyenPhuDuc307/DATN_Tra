@@ -10,17 +10,17 @@
             <h6 class="m-0 font-weight-bold text-primary">@ViewData["Title"]</h6>
             <div class="dropdown no-arrow">
                 <a href="@Url.Action("Details", new { id = Model.Id })" class="btn btn-sm btn-secondary shadow-sm">
-                    <i class="fas fa-arrow-left fa-sm text-white-50"></i> Quay lại chi tiết
+                    <i class="bi bi-arrow-left fa-sm text-white-50"></i> Quay lại chi tiết
                 </a>
             </div>
         </div>
         <div class="card-body">
             @if (TempData["ErrorMessage"] != null)
             {
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        @TempData["ErrorMessage"]
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
             }
 
             <div class="alert alert-danger mb-4">
@@ -36,25 +36,29 @@
                         </div>
                         <div class="card-body">
                             <div class="mb-3 row">
-                                <label class="col-sm-4 col-form-label">@Html.DisplayNameFor(model => model.OrderNumber):</label>
+                                <label class="col-sm-4 col-form-label">@Html.DisplayNameFor(model =>
+                                                                        model.OrderNumber):</label>
                                 <div class="col-sm-8 col-form-label">
                                     <span class="fw-bold">@Html.DisplayFor(model => model.OrderNumber)</span>
                                 </div>
                             </div>
                             <div class="mb-3 row">
-                                <label class="col-sm-4 col-form-label">@Html.DisplayNameFor(model => model.OrderDate):</label>
+                                <label class="col-sm-4 col-form-label">@Html.DisplayNameFor(model =>
+                                                                        model.OrderDate):</label>
                                 <div class="col-sm-8 col-form-label">
                                     @Html.DisplayFor(model => model.OrderDate)
                                 </div>
                             </div>
                             <div class="mb-3 row">
-                                <label class="col-sm-4 col-form-label">@Html.DisplayNameFor(model => model.Supplier):</label>
+                                <label class="col-sm-4 col-form-label">@Html.DisplayNameFor(model =>
+                                                                        model.Supplier):</label>
                                 <div class="col-sm-8 col-form-label">
                                     @Html.DisplayFor(model => model.Supplier.Name)
                                 </div>
                             </div>
                             <div class="mb-3 row">
-                                <label class="col-sm-4 col-form-label">@Html.DisplayNameFor(model => model.Status):</label>
+                                <label class="col-sm-4 col-form-label">@Html.DisplayNameFor(model =>
+                                                                        model.Status):</label>
                                 <div class="col-sm-8 col-form-label">
                                     <span class="badge @GetStatusBadgeClass(Model.Status)">
                                         @Html.DisplayFor(model => model.Status)
@@ -71,13 +75,15 @@
                         </div>
                         <div class="card-body">
                             <div class="mb-3 row">
-                                <label class="col-sm-4 col-form-label">@Html.DisplayNameFor(model => model.SubTotal):</label>
+                                <label class="col-sm-4 col-form-label">@Html.DisplayNameFor(model =>
+                                                                        model.SubTotal):</label>
                                 <div class="col-sm-8 col-form-label">
                                     @Model.SubTotal.ToString("N0") đ
                                 </div>
                             </div>
                             <div class="mb-3 row">
-                                <label class="col-sm-4 col-form-label">@Html.DisplayNameFor(model => model.GrandTotal):</label>
+                                <label class="col-sm-4 col-form-label">@Html.DisplayNameFor(model =>
+                                                                        model.GrandTotal):</label>
                                 <div class="col-sm-8 col-form-label">
                                     <span class="fw-bold">@Model.GrandTotal.ToString("N0") đ</span>
                                 </div>
@@ -107,13 +113,13 @@
                             <tbody>
                                 @foreach (var item in Model.PurchaseOrderDetails)
                                 {
-                                        <tr>
-                                            <td>@item.Product.ProductCode</td>
-                                            <td>@item.Product.Name</td>
-                                            <td class="text-end">@item.Quantity</td>
-                                            <td class="text-end">@item.UnitPrice.ToString("N0") đ</td>
-                                            <td class="text-end">@item.Total.ToString("N0") đ</td>
-                                        </tr>
+                                    <tr>
+                                        <td>@item.Product.ProductCode</td>
+                                        <td>@item.Product.Name</td>
+                                        <td class="text-end">@item.Quantity</td>
+                                        <td class="text-end">@item.UnitPrice.ToString("N0") đ</td>
+                                        <td class="text-end">@item.Total.ToString("N0") đ</td>
+                                    </tr>
                                 }
                             </tbody>
                         </table>

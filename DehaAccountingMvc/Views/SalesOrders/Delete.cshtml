@@ -11,7 +11,7 @@
             <h6 class="m-0 font-weight-bold text-primary">@ViewData["Title"]</h6>
             <div class="dropdown no-arrow">
                 <a href="@Url.Action("Details", new { id = Model.Id })" class="btn btn-sm btn-secondary shadow-sm">
-                    <i class="fas fa-arrow-left fa-sm text-white-50"></i> Quay lại chi tiết
+                    <i class="bi bi-arrow-left fa-sm text-white-50"></i> Quay lại chi tiết
                 </a>
             </div>
         </div>
@@ -38,28 +38,28 @@
                         <div class="card-body">
                             <div class="mb-3 row">
                                 < class="col-sm-4 col-form-label">@Html.DisplayNameFor(model =>
-                                    model.OrderNumber):</ label >
+                                                                        model.OrderNumber):</ label>
                                 <div class="col-sm-8 col-form-label">
                                     <span class="fw-bold">@Html.DisplayFor(model => model.OrderNumber)</span>
                                 </div>
                             </div>
                             <div class="mb-3 row">
                                 < class="col-sm-4 col-form-label">@Html.DisplayNameFor(model =>
-                                    model.OrderDate):</ label >
+                                                                        model.OrderDate):</ label>
                                 <div class="col-sm-8 col-form-label">
                                     @Html.DisplayFor(model => model.OrderDate)
                                 </div>
                             </div>
                             <div class="mb-3 row">
                                 < class="col-sm-4 col-form-label">@Html.DisplayNameFor(model =>
-                                    model.Customer):</ label >
+                                                                        model.Customer):</ label>
                                 <div class="col-sm-8 col-form-label">
                                     @Html.DisplayFor(model => model.Customer.Name)
                                 </div>
                             </div>
                             <div class="mb-3 row">
                                 < class="col-sm-4 col-form-label">@Html.DisplayNameFor(model =>
-                                    model.Status):</ label >
+                                                                        model.Status):</ label>
                                 <div class="col-sm-8 col-form-label">
                                     <span class="badge @GetStatusBadgeClass(Model.Status)">
                                         @Html.DisplayFor(model => model.Status)
@@ -77,14 +77,14 @@
                         <div class="card-body">
                             <div class="mb-3 row">
                                 < class="col-sm-4 col-form-label">@Html.DisplayNameFor(model =>
-                                    model.SubTotal):</ label >
+                                                                        model.SubTotal):</ label>
                                 <div class="col-sm-8 col-form-label">
                                     @Model.SubTotal.ToString("N0") đ
                                 </div>
                             </div>
                             <div class="mb-3 row">
                                 < class="col-sm-4 col-form-label">@Html.DisplayNameFor(model =>
-                                    model.GrandTotal):</ label >
+                                                                        model.GrandTotal):</ label>
                                 <div class="col-sm-8 col-form-label">
                                     <span class="fw-bold">@Model.GrandTotal.ToString("N0") đ</span>
                                 </div>

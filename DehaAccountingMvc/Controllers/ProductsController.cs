@@ -61,7 +61,7 @@ namespace DehaAccountingMvc.Controllers
         // POST: Products/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ProductCode,Name,Description,ProductCategoryId,SupplierId,PurchasePrice,SellingPrice,DiscountPrice,Unit,StockQuantity,MinimumStockLevel,ReorderLevel,LeadTime,Brand,Origin,WarehouseLocation,Barcode,IsSellable,IsActive,IsService,TrackInventory,Notes")] Product product)
+        public async Task<IActionResult> Create([Bind("ProductCode,Name,Description,ProductCategoryId,SupplierId,DefaultSupplierId,PurchasePrice,SellingPrice,DiscountPrice,Unit,StockQuantity,MinimumStockLevel,ReorderLevel,LeadTime,Brand,Origin,WarehouseLocation,Barcode,IsSellable,IsActive,IsService,TrackInventory,Notes")] Product product)
         {
             if (ModelState.IsValid)
             {
@@ -97,7 +97,7 @@ namespace DehaAccountingMvc.Controllers
         // POST: Products/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,ProductCode,Name,Description,ProductCategoryId,SupplierId,PurchasePrice,SellingPrice,DiscountPrice,Unit,StockQuantity,MinimumStockLevel,ReorderLevel,LeadTime,Brand,Origin,WarehouseLocation,Barcode,IsSellable,IsActive,IsService,TrackInventory,Notes,CreatedDate,CreatedBy")] Product product)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,ProductCode,Name,Description,ProductCategoryId,SupplierId,DefaultSupplierId,PurchasePrice,SellingPrice,DiscountPrice,Unit,StockQuantity,MinimumStockLevel,ReorderLevel,LeadTime,Brand,Origin,WarehouseLocation,Barcode,IsSellable,IsActive,IsService,TrackInventory,Notes,CreatedDate,CreatedBy")] Product product)
         {
             if (id != product.Id)
             {

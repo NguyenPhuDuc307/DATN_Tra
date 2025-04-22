@@ -4,20 +4,27 @@
     ViewData["Title"] = "Tạo đơn mua hàng mới";
 }
 
+<style type="text/css">
+    .is-warning {
+        border-color: #ffc107;
+        background-color: #fff8e1;
+    }
+</style>
+
 <div class="container-fluid p-3">
     <div class="card shadow mb-4">
         <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
             <h6 class="m-0 font-weight-bold text-primary">@ViewData["Title"]</h6>
             <div class="dropdown no-arrow">
                 <a href="@Url.Action("Index")" class="btn btn-sm btn-secondary shadow-sm">
-                    <i class="fas fa-arrow-left fa-sm text-white-50"></i> Quay lại danh sách
+                    <i class="bi bi-arrow-left fa-sm text-white-50"></i> Quay lại danh sách
                 </a>
             </div>
         </div>
         <div class="card-body">
             <form asp-action="Create" id="createPurchaseOrderForm">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                
+
                 <div class="row">
                     <div class="col-md-6">
                         <div class="card mb-4">
@@ -58,7 +65,8 @@
                                 <div class="mb-3 row">
                                     <label asp-for="PaymentMethod" class="col-sm-4 col-form-label"></label>
                                     <div class="col-sm-8">
-                                        <select asp-for="PaymentMethod" class="form-control" asp-items="ViewBag.PaymentMethods">
+                                        <select asp-for="PaymentMethod" class="form-control"
+                                            asp-items="ViewBag.PaymentMethods">
                                             <option value="">-- Chọn phương thức thanh toán --</option>
                                         </select>
                                         <span asp-validation-for="PaymentMethod" class="text-danger"></span>
@@ -111,7 +119,7 @@
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h6 class="m-0 font-weight-bold text-primary">Chi tiết đơn hàng</h6>
                         <button type="button" class="btn btn-sm btn-primary" id="btnAddProduct">
-                            <i class="fas fa-plus"></i> Thêm sản phẩm
+                            <i class="bi bi-plus"></i> Thêm sản phẩm
                         </button>
                     </div>
                     <div class="card-body">
@@ -137,23 +145,28 @@
                                             </select>
                                         </td>
                                         <td>
-                                            <input type="number" class="form-control text-end product-quantity" name="quantity" value="1" min="1" required />
+                                            <input type="number" class="form-control text-end product-quantity"
+                                                name="quantity" value="1" min="1" required />
                                         </td>
                                         <td>
-                                            <input type="number" class="form-control text-end product-price" name="unitPrice" value="0" min="0" required />
+                                            <input type="number" class="form-control text-end product-price"
+                                                name="unitPrice" value="0" min="0" required />
                                         </td>
                                         <td>
-                                            <input type="number" class="form-control text-end product-discount" name="discountPercentage" value="0" min="0" max="100" />
+                                            <input type="number" class="form-control text-end product-discount"
+                                                name="discountPercentage" value="0" min="0" max="100" />
                                         </td>
                                         <td>
-                                            <input type="text" class="form-control text-end product-subtotal" value="0" readonly />
+                                            <input type="text" class="form-control text-end product-subtotal" value="0"
+                                                readonly />
                                         </td>
                                         <td>
-                                            <input type="text" class="form-control warehouse-location" name="warehouseLocation" />
+                                            <input type="text" class="form-control warehouse-location"
+                                                name="warehouseLocation" />
                                         </td>
                                         <td class="text-center">
                                             <button type="button" class="btn btn-sm btn-danger btn-remove-product">
-                                                <i class="fas fa-trash"></i>
+                                                <i class="bi bi-trash"></i>
                                             </button>
                                         </td>
                                     </tr>
@@ -184,109 +197,170 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 
-        <script>
-            $(document).ready(function () {
-                // Lưu trữ danh sách sản phẩm
-                var products = @Html.Raw(Json.Serialize(ViewBag.Products));
-        
-                // Hàm định dạng số
-                function formatCurrency(value) {
-                    return new Intl.NumberFormat('vi-VN').format(value) + ' đ';
-                }
-        
-                // Hàm tính tổng tiền
-                function calculateTotal() {
-                    var grandTotal = 0;
-                    $('#productTable tbody tr:visible').each(function() {
-                        var quantity = parseFloat($(this).find('.product-quantity').val()) || 0;
-                        var price = parseFloat($(this).find('.product-price').val()) || 0;
-                        var discount = parseFloat($(this).find('.product-discount').val()) || 0;
-                    
-                        var subtotal = quantity * price;
-                        var discountAmount = subtotal * (discount / 100);
-                        var total = subtotal - discountAmount;
-                    
-                        $(this).find('.product-subtotal').val(formatCurrency(total));
-                        grandTotal += total;
-                    });
-                
-                    $('#grandTotal').text(formatCurrency(grandTotal));
-                }
-            
-                // Hàm thêm dòng sản phẩm mới
-                function addProductRow() {
-                    var $template = $('#productRowTemplate');
-                    var $newRow = $template.clone().removeAttr('id').show();
-                
-                    // Thêm các sản phẩm vào dropdown
-                    var $select = $newRow.find('.product-select');
-                    $.each(products, function(i, product) {
-                        $select.append($('<option>', {
-                            value: product.id,
-                            text: product.productCode + ' - ' + product.name,
-                            'data-price': product.purchasePrice,
-                            'data-location': product.warehouseLocation || ''
-                        }));
-                    });
-                
-                    // Xử lý sự kiện khi chọn sản phẩm
-                    $select.on('change', function() {
-                        var selectedOption = $(this).find('option:selected');
-                        var price = selectedOption.data('price') || 0;
-                        var location = selectedOption.data('location') || '';
-                    
-                        var $row = $(this).closest('tr');
-                        $row.find('.product-price').val(price);
-                        $row.find('.warehouse-location').val(location);
-                        calculateTotal();
-                    });
-                
-                    // Xử lý sự kiện khi thay đổi số lượng, đơn giá hoặc chiết khấu
-                    $newRow.find('.product-quantity, .product-price, .product-discount').on('input', calculateTotal);
-                
-                    // Xử lý sự kiện khi xóa dòng
-                    $newRow.find('.btn-remove-product').on('click', function() {
-                        $(this).closest('tr').remove();
-                        calculateTotal();
-                    });
-                
-                    // Thêm dòng mới vào bảng
-                    $('#productTable tbody').append($newRow);
-                }
-            
+    <script>
+        $(document).ready(function () {
+            // Lưu trữ danh sách sản phẩm
+            var products = @Html.Raw(Json.Serialize(ViewBag.Products));
+
+            // Hàm định dạng số
+            function formatCurrency(value) {
+                return new Intl.NumberFormat('vi-VN').format(value) + ' đ';
+            }
+
+            // Hàm tính tổng tiền
+            function calculateTotal() {
+                var grandTotal = 0;
+                $('#productTable tbody tr:visible').each(function () {
+                    var quantity = parseFloat($(this).find('.product-quantity').val()) || 0;
+                    var price = parseFloat($(this).find('.product-price').val()) || 0;
+                    var discount = parseFloat($(this).find('.product-discount').val()) || 0;
+
+                    var subtotal = quantity * price;
+                    var discountAmount = subtotal * (discount / 100);
+                    var total = subtotal - discountAmount;
+
+                    $(this).find('.product-subtotal').val(formatCurrency(total));
+                    grandTotal += total;
+                });
+
+                $('#grandTotal').text(formatCurrency(grandTotal));
+            }
+
+            // Hàm thêm dòng sản phẩm mới
+            function addProductRow() {
+                var $template = $('#productRowTemplate');
+                var $newRow = $template.clone().removeAttr('id').show();
+
+                // Thêm các sản phẩm vào dropdown
+                var $select = $newRow.find('.product-select');
+                $.each(products, function (i, product) {
+                    $select.append($('<option>', {
+                        value: product.id,
+                        text: product.productCode + ' - ' + product.name,
+                        'data-price': product.purchasePrice,
+                        'data-location': product.warehouseLocation || ''
+                    }));
+                });
+
+                // Xử lý sự kiện khi chọn sản phẩm
+                $select.on('change', function () {
+                    var selectedOption = $(this).find('option:selected');
+                    var price = selectedOption.data('price') || 0;
+                    var location = selectedOption.data('location') || '';
+
+                    var $row = $(this).closest('tr');
+                    $row.find('.product-price').val(price);
+                    $row.find('.warehouse-location').val(location);
+                    calculateTotal();
+                });
+
+                // Xử lý sự kiện khi thay đổi số lượng, đơn giá hoặc chiết khấu
+                $newRow.find('.product-quantity, .product-price, .product-discount').on('input', calculateTotal);
+
+                // Xử lý sự kiện khi xóa dòng
+                $newRow.find('.btn-remove-product').on('click', function () {
+                    $(this).closest('tr').remove();
+                    calculateTotal();
+                });
+
+                // Thêm dòng mới vào bảng
+                $('#productTable tbody').append($newRow);
+
+                return $newRow; // Trả về dòng mới để có thể thao tác tiếp
+            }
+
+            // Kiểm tra xem có sản phẩm được chọn trước không
+            var preselectedProduct = @Html.Raw(ViewBag.PreselectedProduct != null ? Json.Serialize(ViewBag.PreselectedProduct) : "null");
+
+            if (preselectedProduct) {
+                // Thêm dòng sản phẩm với sản phẩm được chọn trước
+                var $row = addProductRow();
+
+                // Chọn sản phẩm
+                $row.find('.product-select').val(preselectedProduct.id).trigger('change');
+
+                // Điền số lượng đề xuất
+                $row.find('.product-quantity').val(preselectedProduct.recommendedQuantity);
+
+                // Cập nhật giá và vị trí kho
+                $row.find('.product-price').val(preselectedProduct.purchasePrice);
+                $row.find('.warehouse-location').val(preselectedProduct.warehouseLocation || '');
+
+                // Tính toán lại tổng tiền
+                calculateTotal();
+            } else {
                 // Thêm dòng sản phẩm đầu tiên
                 addProductRow();
-            
-                // Xử lý sự kiện khi nhấn nút thêm sản phẩm
-                $('#btnAddProduct').on('click', addProductRow);
-            
-                // Xử lý sự kiện submit form
-                $('#createPurchaseOrderForm').on('submit', function(event) {
-                    // Kiểm tra xem có ít nhất một sản phẩm được thêm vào không
-                    if ($('#productTable tbody tr:visible').length === 0) {
-                        alert('Vui lòng thêm ít nhất một sản phẩm vào đơn hàng');
-                        event.preventDefault();
-                        return false;
-                    }
-                
-                    // Kiểm tra xem tất cả các sản phẩm đã được chọn chưa
-                    var valid = true;
-                    $('#productTable tbody tr:visible').each(function() {
-                        var productId = $(this).find('.product-select').val();
-                        if (!productId) {
-                            valid = false;
-                            $(this).find('.product-select').addClass('is-invalid');
-                        } else {
-                            $(this).find('.product-select').removeClass('is-invalid');
-                        }
-                    });
-                
-                    if (!valid) {
-                        alert('Vui lòng chọn sản phẩm cho tất cả các dòng');
-                        event.preventDefault();
-                        return false;
+            }
+
+            // Xử lý sự kiện khi nhấn nút thêm sản phẩm
+            $('#btnAddProduct').on('click', addProductRow);
+
+            // Xử lý sự kiện submit form
+            $('#createPurchaseOrderForm').on('submit', function (event) {
+                // Kiểm tra xem có ít nhất một sản phẩm được thêm vào không
+                if ($('#productTable tbody tr:visible').length === 0) {
+                    alert('Vui lòng thêm ít nhất một sản phẩm vào đơn hàng');
+                    event.preventDefault();
+                    return false;
+                }
+
+                // Kiểm tra xem tất cả các sản phẩm đã được chọn chưa
+                var valid = true;
+                $('#productTable tbody tr:visible').each(function () {
+                    var productId = $(this).find('.product-select').val();
+                    if (!productId) {
+                        valid = false;
+                        $(this).find('.product-select').addClass('is-invalid');
+                    } else {
+                        $(this).find('.product-select').removeClass('is-invalid');
                     }
                 });
+
+                if (!valid) {
+                    alert('Vui lòng chọn sản phẩm cho tất cả các dòng');
+                    event.preventDefault();
+                    return false;
+                }
+
+                // Kiểm tra số lượng sản phẩm
+                var quantityValid = true;
+                $('#productTable tbody tr:visible').each(function () {
+                    var quantity = parseInt($(this).find('.product-quantity').val());
+
+                    if (quantity <= 0) {
+                        quantityValid = false;
+                        $(this).find('.product-quantity').addClass('is-invalid');
+                    } else {
+                        $(this).find('.product-quantity').removeClass('is-invalid');
+                    }
+                });
+
+                if (!quantityValid) {
+                    alert('Số lượng sản phẩm phải lớn hơn 0');
+                    event.preventDefault();
+                    return false;
+                }
+
+                // Kiểm tra giá sản phẩm
+                var priceValid = true;
+                $('#productTable tbody tr:visible').each(function () {
+                    var price = parseFloat($(this).find('.product-price').val());
+
+                    if (price <= 0) {
+                        priceValid = false;
+                        $(this).find('.product-price').addClass('is-invalid');
+                    } else {
+                        $(this).find('.product-price').removeClass('is-invalid');
+                    }
+                });
+
+                if (!priceValid) {
+                    alert('Đơn giá sản phẩm phải lớn hơn 0');
+                    event.preventDefault();
+                    return false;
+                }
             });
-        </script>
+        });
+    </script>
 }

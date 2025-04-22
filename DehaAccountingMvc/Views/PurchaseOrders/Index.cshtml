@@ -10,24 +10,24 @@
             <h6 class="m-0 font-weight-bold text-primary">@ViewData["Title"]</h6>
             <div class="dropdown no-arrow">
                 <a href="@Url.Action("Create")" class="btn btn-sm btn-primary shadow-sm">
-                    <i class="fas fa-plus fa-sm text-white-50"></i> Tạo đơn mua hàng
+                    <i class="bi bi-plus fa-sm text-white-50"></i> Tạo đơn mua hàng
                 </a>
             </div>
         </div>
         <div class="card-body">
             @if (TempData["SuccessMessage"] != null)
             {
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        @TempData["SuccessMessage"]
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
             }
             @if (TempData["ErrorMessage"] != null)
             {
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        @TempData["ErrorMessage"]
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
             }
 
             <div class="table-responsive">
@@ -47,34 +47,35 @@
                     <tbody>
                         @foreach (var item in Model)
                         {
-                                <tr>
-                                    <td>
-                                        <a asp-action="Details" asp-route-id="@item.Id">@Html.DisplayFor(modelItem => item.OrderNumber)</a>
-                                    </td>
-                                    <td>@Html.DisplayFor(modelItem => item.OrderDate)</td>
-                                    <td>@Html.DisplayFor(modelItem => item.Supplier.Name)</td>
-                                    <td>
-                                        <span class="badge @GetStatusBadgeClass(item.Status)">
-                                            @Html.DisplayFor(modelItem => item.Status)
-                                        </span>
-                                    </td>
-                                    <td class="text-end">@item.GrandTotal.ToString("N0") đ</td>
-                                    <td class="text-end">@item.AmountPaid.ToString("N0") đ</td>
-                                    <td class="text-end">@item.AmountDue.ToString("N0") đ</td>
-                                    <td>
-                                        <div class="btn-group" role="group">
-                                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">
-                                                <i class="fas fa-info-circle"></i> Chi tiết
+                            <tr>
+                                <td>
+                                    <a asp-action="Details" asp-route-id="@item.Id">@Html.DisplayFor(modelItem =>
+                                                                            item.OrderNumber)</a>
+                            </td>
+                            <td>@Html.DisplayFor(modelItem => item.OrderDate)</td>
+                            <td>@Html.DisplayFor(modelItem => item.Supplier.Name)</td>
+                            <td>
+                                <span class="badge @GetStatusBadgeClass(item.Status)">
+                                    @Html.DisplayFor(modelItem => item.Status)
+                                </span>
+                            </td>
+                            <td class="text-end">@item.GrandTotal.ToString("N0") đ</td>
+                            <td class="text-end">@item.AmountPaid.ToString("N0") đ</td>
+                            <td class="text-end">@item.AmountDue.ToString("N0") đ</td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">
+                                        <i class="bi bi-info-circle"></i> Chi tiết
+                                    </a>
+                                    @if (item.Status == DehaAccountingMvc.Models.Accounting.PurchaseOrderStatus.New)
+                                        {
+                                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-primary">
+                                                <i class="bi bi-edit"></i> Sửa
                                             </a>
-                                            @if (item.Status == DehaAccountingMvc.Models.Accounting.PurchaseOrderStatus.New)
-                                            {
-                                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-primary">
-                                                        <i class="fas fa-edit"></i> Sửa
-                                                    </a>
-                                            }
-                                        </div>
-                                    </td>
-                                </tr>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
                         }
                     </tbody>
                 </table>
@@ -101,11 +102,60 @@
 }
 
 @section Scripts {
-        <script>
-            $(document).ready(function () {
-                $('#dataTable').DataTable({
-                    "order": [[1, "desc"]]
-                });
+    <script>
+        $(document).ready(function () {
+            $('#dataTable').DataTable({
+                "order": [[1, "desc"]],
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/vi.json"
+                },
+                "columnDefs": [
+                    { "type": "date", "targets": 1 },
+                    { "orderable": false, "targets": 7 }
+                ],
+                "initComplete": function () {
+                    // Thêm bộ lọc trạng thái
+                    this.api().columns(3).every(function () {
+                        var column = this;
+                        var select = $('<select class="form-select form-select-sm"><option value="">Tất cả trạng thái</option></select>')
+                            .appendTo($(column.header()).empty())
+                            .on('change', function () {
+                                var val = $.fn.dataTable.util.escapeRegex(
+                                    $(this).val()
+                                );
+
+                                column
+                                    .search(val ? '^' + val + '$' : '', true, false)
+                                    .draw();
+                            });
+
+                        column.data().unique().sort().each(function (d, j) {
+                            var status = $(d).text().trim();
+                            select.append('<option value="' + status + '">' + status + '</option>');
+                        });
+                    });
+
+                    // Thêm bộ lọc nhà cung cấp
+                    this.api().columns(2).every(function () {
+                        var column = this;
+                        var select = $('<select class="form-select form-select-sm"><option value="">Tất cả nhà cung cấp</option></select>')
+                            .appendTo($(column.header()).empty())
+                            .on('change', function () {
+                                var val = $.fn.dataTable.util.escapeRegex(
+                                    $(this).val()
+                                );
+
+                                column
+                                    .search(val ? '^' + val + '$' : '', true, false)
+                                    .draw();
+                            });
+
+                        column.data().unique().sort().each(function (d, j) {
+                            select.append('<option value="' + d + '">' + d + '</option>');
+                        });
+                    });
+                }
             });
-        </script>
+        });
+    </script>
 }

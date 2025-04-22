@@ -62,8 +62,17 @@
                                 }
                                 else
                                 {
-                                    @Html.DisplayFor(modelItem => item.StockQuantity)
-                                    @Html.DisplayFor(modelItem => item.Unit)
+                                    <div class="d-flex align-items-center">
+                                        <span class="me-2">@item.StockQuantity @item.Unit</span>
+                                        @if (item.StockQuantity <= 5 && !item.IsService)
+                                        {
+                                            <span class="badge bg-danger">Tồn thấp</span>
+                                        }
+                                        else if (item.StockQuantity <= 10 && !item.IsService)
+                                        {
+                                            <span class="badge bg-warning">Sắp hết</span>
+                                        }
+                                    </div>
                                 }
                             </td>
                             <td>
@@ -89,11 +98,19 @@
                             <td>
                                 <div class="btn-group" role="group">
                                     <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-primary"><i
-                                            class="fa fa-edit"></i></a>
+                                            class="bi bi-pencil"></i></a>
                                     <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info"><i
-                                            class="fa fa-info-circle"></i></a>
+                                            class="bi bi-info-circle"></i></a>
                                     <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger"><i
-                                            class="fa fa-trash"></i></a>
+                                            class="bi bi-trash"></i></a>
+                                    @if (!item.IsService && item.StockQuantity <= 10)
+                                    {
+                                        <a asp-controller="PurchaseOrders" asp-action="CreateForProduct"
+                                            asp-route-productId="@item.Id" class="btn btn-sm btn-success"
+                                            title="Tạo đơn mua hàng">
+                                            <i class="bi bi-cart-plus"></i>
+                                        </a>
+                                    }
                                 </div>
                             </td>
                         </tr>
@@ -111,7 +128,63 @@
                 language: {
                     url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/vi.json'
                 },
-                order: [[0, 'asc']]
+                order: [[0, 'asc']],
+                columnDefs: [
+                    { orderable: false, targets: 7 },
+                    {
+                        targets: 4,
+                        createdCell: function (td, cellData, rowData, row, col) {
+                            // Add a tooltip to the stock quantity cell
+                            if ($(td).find('.badge.bg-danger').length > 0) {
+                                $(td).attr('title', 'Cần đặt hàng ngay!');
+                            } else if ($(td).find('.badge.bg-warning').length > 0) {
+                                $(td).attr('title', 'Nên đặt hàng thêm');
+                            }
+                        }
+                    }
+                ],
+                initComplete: function () {
+                    // Add filter for product category
+                    this.api().columns(2).every(function () {
+                        var column = this;
+                        var select = $('<select class="form-select form-select-sm"><option value="">Tất cả danh mục</option></select>')
+                            .appendTo($(column.header()).empty())
+                            .on('change', function () {
+                                var val = $.fn.dataTable.util.escapeRegex(
+                                    $(this).val()
+                                );
+
+                                column
+                                    .search(val ? '^' + val + '$' : '', true, false)
+                                    .draw();
+                            });
+
+                        column.data().unique().sort().each(function (d, j) {
+                            if (d) select.append('<option value="' + d + '">' + d + '</option>');
+                        });
+                    });
+
+                    // Add filter for product type (service/product)
+                    this.api().columns(5).every(function () {
+                        var column = this;
+                        var select = $('<select class="form-select form-select-sm"><option value="">Tất cả</option></select>')
+                            .appendTo($(column.header()).empty())
+                            .on('change', function () {
+                                var val = $.fn.dataTable.util.escapeRegex(
+                                    $(this).val()
+                                );
+
+                                column
+                                    .search(val ? '^' + val + '$' : '', true, false)
+                                    .draw();
+                            });
+
+                        column.data().unique().sort().each(function (d, j) {
+                            var text = $(d).text().trim();
+                            select.append('<option value="' + text + '">' + text + '</option>');
+                        });
+                    });
+                }
             });
         });
     </script>

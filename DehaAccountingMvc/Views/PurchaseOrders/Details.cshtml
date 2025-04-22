@@ -4,13 +4,62 @@
     ViewData["Title"] = "Chi tiết đơn mua hàng";
 }
 
+<style>
+    .order-status-timeline .progress {
+        height: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .status-steps {
+        position: relative;
+    }
+    
+    .status-step {
+        text-align: center;
+        position: relative;
+        width: 16%;
+        opacity: 0.5;
+    }
+    
+    .status-step.active {
+        opacity: 1;
+        font-weight: bold;
+    }
+    
+    .status-step.completed {
+        opacity: 1;
+    }
+    
+    .step-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #e9ecef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 5px;
+        font-size: 1.2rem;
+    }
+    
+    .status-step.active .step-icon {
+        background-color: #0d6efd;
+        color: white;
+    }
+    
+    .status-step.completed .step-icon {
+        background-color: #198754;
+        color: white;
+    }
+</style>
+
 <div class="container-fluid p-3">
     <div class="card shadow mb-4">
         <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
             <h6 class="m-0 font-weight-bold text-primary">@ViewData["Title"]</h6>
             <div class="dropdown no-arrow">
                 <a href="@Url.Action("Index")" class="btn btn-sm btn-secondary shadow-sm">
-                    <i class="fas fa-arrow-left fa-sm text-white-50"></i> Quay lại danh sách
+                    <i class="bi bi-arrow-left fa-sm text-white-50"></i> Quay lại danh sách
                 </a>
             </div>
         </div>
@@ -29,6 +78,64 @@
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
             }
+
+            <!-- Thanh trạng thái đơn hàng -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="m-0 font-weight-bold text-primary">Trạng thái đơn hàng</h6>
+                </div>
+                <div class="card-body">
+                    <div class="order-status-timeline">
+                        <div class="progress">
+                            @{
+                                int progressPercent = Model.Status switch
+                                {
+                                    DehaAccountingMvc.Models.Accounting.PurchaseOrderStatus.New => 20,
+                                    DehaAccountingMvc.Models.Accounting.PurchaseOrderStatus.Approved => 40,
+                                    DehaAccountingMvc.Models.Accounting.PurchaseOrderStatus.PartiallyReceived => 60,
+                                    DehaAccountingMvc.Models.Accounting.PurchaseOrderStatus.FullyReceived => 80,
+                                    DehaAccountingMvc.Models.Accounting.PurchaseOrderStatus.PartiallyPaid => 90,
+                                    DehaAccountingMvc.Models.Accounting.PurchaseOrderStatus.FullyPaid => 100,
+                                    DehaAccountingMvc.Models.Accounting.PurchaseOrderStatus.Cancelled => 0,
+                                    _ => 0
+                                };
+
+                                string progressClass = Model.Status switch
+                                {
+                                    DehaAccountingMvc.Models.Accounting.PurchaseOrderStatus.New => "bg-primary",
+                                    DehaAccountingMvc.Models.Accounting.PurchaseOrderStatus.Approved => "bg-info",
+                                    DehaAccountingMvc.Models.Accounting.PurchaseOrderStatus.PartiallyReceived => "bg-warning",
+                                    DehaAccountingMvc.Models.Accounting.PurchaseOrderStatus.FullyReceived => "bg-success",
+                                    DehaAccountingMvc.Models.Accounting.PurchaseOrderStatus.PartiallyPaid => "bg-warning",
+                                    DehaAccountingMvc.Models.Accounting.PurchaseOrderStatus.FullyPaid => "bg-success",
+                                    DehaAccountingMvc.Models.Accounting.PurchaseOrderStatus.Cancelled => "bg-danger",
+                                    _ => "bg-secondary"
+                                };
+                            }
+                            <div class="progress-bar @progressClass" role="progressbar" style="width: @progressPercent%"
+                                 aria-valuenow="@progressPercent" aria-valuemin="0" aria-valuemax="100">@progressPercent%</div>
+                        </div>
+                        <div class="status-steps mt-3 d-flex justify-content-between">
+                            <div class="status-step @(Model.Status != DehaAccountingMvc.Models.Accounting.PurchaseOrderStatus.Cancelled ? (Model.Status == DehaAccountingMvc.Models.Accounting.PurchaseOrderStatus.New ? "active" : "completed") : "")">
+                                <div class="step-icon"><i class="bi bi-file-earmark-text"></i></div>
+                                <div class="step-label">Đơn mới</div>
+                            </div>
+                            <div class="status-step @(Model.Status >= DehaAccountingMvc.Models.Accounting.PurchaseOrderStatus.Approved && Model.Status != DehaAccountingMvc.Models.Accounting.PurchaseOrderStatus.Cancelled ? (Model.Status == DehaAccountingMvc.Models.Accounting.PurchaseOrderStatus.Approved ? "active" : "completed") : "")">
+                                <div class="step-icon"><i class="bi bi-check-circle"></i></div>
+                                <div class="step-label">Duyệt</div>
+                            </div>
+                            <div class="status-step @(Model.Status >= DehaAccountingMvc.Models.Accounting.PurchaseOrderStatus.PartiallyReceived && Model.Status != DehaAccountingMvc.Models.Accounting.PurchaseOrderStatus.Cancelled ? (Model.Status == DehaAccountingMvc.Models.Accounting.PurchaseOrderStatus.PartiallyReceived || Model.Status == DehaAccountingMvc.Models.Accounting.PurchaseOrderStatus.FullyReceived ? "active" : "completed") : "")">
+                                <div class="step-icon"><i class="bi bi-truck"></i></div>
+                                <div class="step-label">Nhận hàng</div>
+                            </div>
+                            <div class="status-step @(Model.Status >= DehaAccountingMvc.Models.Accounting.PurchaseOrderStatus.PartiallyPaid && Model.Status != DehaAccountingMvc.Models.Accounting.PurchaseOrderStatus.Cancelled ? (Model.Status == DehaAccountingMvc.Models.Accounting.PurchaseOrderStatus.PartiallyPaid ? "active" : (Model.Status == DehaAccountingMvc.Models.Accounting.PurchaseOrderStatus.FullyPaid ? "completed" : "")) : "")">
+                                <div class="step-icon"><i class="bi bi-credit-card"></i></div>
+                                <div class="step-label">Thanh toán</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <div class="row">
                 <div class="col-md-6">
@@ -280,15 +387,15 @@
                         @if (Model.Status == DehaAccountingMvc.Models.Accounting.PurchaseOrderStatus.New)
                         {
                                 <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
-                                    <i class="fas fa-edit"></i> Sửa đơn hàng
+                                    <i class="bi bi-edit"></i> Sửa đơn hàng
                                 </a>
 
                                 <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#approveOrderModal">
-                                    <i class="fas fa-check"></i> Duyệt đơn hàng
+                                    <i class="bi bi-check"></i> Duyệt đơn hàng
                                 </button>
 
                                 <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">
-                                    <i class="fas fa-trash"></i> Xóa đơn hàng
+                                    <i class="bi bi-trash"></i> Xóa đơn hàng
                                 </a>
                         }
 
@@ -296,7 +403,7 @@
                                                           Model.Status == DehaAccountingMvc.Models.Accounting.PurchaseOrderStatus.PartiallyReceived)
                         {
                                 <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#receiveItemsModal">
-                                    <i class="fas fa-truck"></i> Nhập kho
+                                    <i class="bi bi-truck"></i> Nhập kho
                                 </button>
                         }
                     </div>

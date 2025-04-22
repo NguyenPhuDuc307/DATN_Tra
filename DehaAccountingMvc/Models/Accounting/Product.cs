@@ -83,6 +83,9 @@ namespace DehaAccountingMvc.Models.Accounting
         [Display(Name = "Nhà cung cấp")]
         public int? SupplierId { get; set; }
 
+        [Display(Name = "Nhà cung cấp mặc định")]
+        public int? DefaultSupplierId { get; set; }
+
         [Column(TypeName = "decimal(18,2)")]
         [Display(Name = "Giá nhập")]
         public decimal PurchasePrice { get; set; }

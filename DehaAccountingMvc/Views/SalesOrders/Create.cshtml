@@ -4,13 +4,20 @@
     ViewData["Title"] = "Tạo đơn bán hàng mới";
 }
 
+<style type="text/css">
+    .is-warning {
+        border-color: #ffc107;
+        background-color: #fff8e1;
+    }
+</style>
+
 <div class="container-fluid p-3">
     <div class="card shadow mb-4">
         <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
             <h6 class="m-0 font-weight-bold text-primary">@ViewData["Title"]</h6>
             <div class="dropdown no-arrow">
                 <a href="@Url.Action("Index")" class="btn btn-sm btn-secondary shadow-sm">
-                    <i class="fas fa-arrow-left fa-sm text-white-50"></i> Quay lại danh sách
+                    <i class="bi bi-arrow-left fa-sm text-white-50"></i> Quay lại danh sách
                 </a>
             </div>
         </div>
@@ -119,7 +126,7 @@
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h6 class="m-0 font-weight-bold text-primary">Chi tiết đơn hàng</h6>
                         <button type="button" class="btn btn-sm btn-primary" id="btnAddProduct">
-                            <i class="fas fa-plus"></i> Thêm sản phẩm
+                            <i class="bi bi-plus"></i> Thêm sản phẩm
                         </button>
                     </div>
                     <div class="card-body">
@@ -161,7 +168,7 @@
                                         </td>
                                         <td class="text-center">
                                             <button type="button" class="btn btn-sm btn-danger btn-remove-product">
-                                                <i class="fas fa-trash"></i>
+                                                <i class="bi bi-trash"></i>
                                             </button>
                                         </td>
                                     </tr>
@@ -259,6 +266,62 @@
                 $('#productTable tbody').append(newRow);
                 calculateTotal();
             }
+
+            // Xử lý sự kiện submit form
+            $('#createSalesOrderForm').on('submit', function (event) {
+                // Kiểm tra xem có ít nhất một sản phẩm được thêm vào không
+                if ($('#productTable tbody tr:visible').length === 0) {
+                    alert('Vui lòng thêm ít nhất một sản phẩm vào đơn hàng');
+                    event.preventDefault();
+                    return false;
+                }
+
+                // Kiểm tra xem tất cả các sản phẩm đã được chọn chưa
+                var valid = true;
+                $('#productTable tbody tr:visible').each(function () {
+                    var productId = $(this).find('.product-select').val();
+                    if (!productId) {
+                        valid = false;
+                        $(this).find('.product-select').addClass('is-invalid');
+                    } else {
+                        $(this).find('.product-select').removeClass('is-invalid');
+                    }
+                });
+
+                if (!valid) {
+                    alert('Vui lòng chọn sản phẩm cho tất cả các dòng');
+                    event.preventDefault();
+                    return false;
+                }
+
+                // Kiểm tra số lượng sản phẩm
+                var quantityValid = true;
+                $('#productTable tbody tr:visible').each(function () {
+                    var quantity = parseInt($(this).find('.product-quantity').val());
+                    var productId = $(this).find('.product-select').val();
+                    var selectedOption = $(this).find('.product-select option:selected');
+                    var stockQuantity = selectedOption.data('stock') || 0;
+                    var isService = selectedOption.data('is-service') || false;
+
+                    if (quantity <= 0) {
+                        quantityValid = false;
+                        $(this).find('.product-quantity').addClass('is-invalid');
+                    } else if (!isService && quantity > stockQuantity) {
+                        // Hiển thị cảnh báo nếu số lượng vượt quá tồn kho (chỉ áp dụng cho sản phẩm, không áp dụng cho dịch vụ)
+                        $(this).find('.product-quantity').addClass('is-warning');
+                        if (!confirm('Số lượng sản phẩm "' + selectedOption.text() + '" vượt quá số lượng tồn kho (' + stockQuantity + '). Bạn có muốn tiếp tục?')) {
+                            quantityValid = false;
+                        }
+                    } else {
+                        $(this).find('.product-quantity').removeClass('is-invalid is-warning');
+                    }
+                });
+
+                if (!quantityValid) {
+                    event.preventDefault();
+                    return false;
+                }
+            });
 
             // Thêm sản phẩm mới khi click nút
             $('#btnAddProduct').on('click', function () {
