@@ -1,0 +1,292 @@
+@model DehaAccountingMvc.Models.Accounting.PurchaseOrder
+
+@{
+    ViewData["Title"] = "Tạo đơn mua hàng mới";
+}
+
+<div class="container-fluid p-3">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 font-weight-bold text-primary">@ViewData["Title"]</h6>
+            <div class="dropdown no-arrow">
+                <a href="@Url.Action("Index")" class="btn btn-sm btn-secondary shadow-sm">
+                    <i class="fas fa-arrow-left fa-sm text-white-50"></i> Quay lại danh sách
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form asp-action="Create" id="createPurchaseOrderForm">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h6 class="m-0 font-weight-bold text-primary">Thông tin đơn hàng</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3 row">
+                                    <label asp-for="OrderNumber" class="col-sm-4 col-form-label"></label>
+                                    <div class="col-sm-8">
+                                        <input asp-for="OrderNumber" class="form-control" readonly />
+                                        <span asp-validation-for="OrderNumber" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="mb-3 row">
+                                    <label asp-for="OrderDate" class="col-sm-4 col-form-label"></label>
+                                    <div class="col-sm-8">
+                                        <input asp-for="OrderDate" class="form-control" type="date" />
+                                        <span asp-validation-for="OrderDate" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="mb-3 row">
+                                    <label asp-for="SupplierId" class="col-sm-4 col-form-label"></label>
+                                    <div class="col-sm-8">
+                                        <select asp-for="SupplierId" class="form-control" asp-items="ViewBag.Suppliers">
+                                            <option value="">-- Chọn nhà cung cấp --</option>
+                                        </select>
+                                        <span asp-validation-for="SupplierId" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="mb-3 row">
+                                    <label asp-for="ReferenceNumber" class="col-sm-4 col-form-label"></label>
+                                    <div class="col-sm-8">
+                                        <input asp-for="ReferenceNumber" class="form-control" />
+                                        <span asp-validation-for="ReferenceNumber" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="mb-3 row">
+                                    <label asp-for="PaymentMethod" class="col-sm-4 col-form-label"></label>
+                                    <div class="col-sm-8">
+                                        <select asp-for="PaymentMethod" class="form-control" asp-items="ViewBag.PaymentMethods">
+                                            <option value="">-- Chọn phương thức thanh toán --</option>
+                                        </select>
+                                        <span asp-validation-for="PaymentMethod" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="mb-3 row">
+                                    <label asp-for="PaymentTerms" class="col-sm-4 col-form-label"></label>
+                                    <div class="col-sm-8">
+                                        <input asp-for="PaymentTerms" class="form-control" />
+                                        <span asp-validation-for="PaymentTerms" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h6 class="m-0 font-weight-bold text-primary">Thông tin giao nhận</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3 row">
+                                    <label asp-for="ExpectedDeliveryDate" class="col-sm-4 col-form-label"></label>
+                                    <div class="col-sm-8">
+                                        <input asp-for="ExpectedDeliveryDate" class="form-control" type="date" />
+                                        <span asp-validation-for="ExpectedDeliveryDate" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="mb-3 row">
+                                    <label asp-for="DeliveryAddress" class="col-sm-4 col-form-label"></label>
+                                    <div class="col-sm-8">
+                                        <textarea asp-for="DeliveryAddress" class="form-control" rows="3"></textarea>
+                                        <span asp-validation-for="DeliveryAddress" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="mb-3 row">
+                                    <label asp-for="Notes" class="col-sm-4 col-form-label"></label>
+                                    <div class="col-sm-8">
+                                        <textarea asp-for="Notes" class="form-control" rows="3"></textarea>
+                                        <span asp-validation-for="Notes" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chi tiết đơn hàng -->
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h6 class="m-0 font-weight-bold text-primary">Chi tiết đơn hàng</h6>
+                        <button type="button" class="btn btn-sm btn-primary" id="btnAddProduct">
+                            <i class="fas fa-plus"></i> Thêm sản phẩm
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="productTable">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Sản phẩm</th>
+                                        <th class="text-end" style="width: 120px;">Số lượng</th>
+                                        <th class="text-end" style="width: 150px;">Đơn giá</th>
+                                        <th class="text-end" style="width: 120px;">Chiết khấu (%)</th>
+                                        <th class="text-end" style="width: 150px;">Thành tiền</th>
+                                        <th style="width: 150px;">Vị trí kho</th>
+                                        <th style="width: 80px;"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Dòng mẫu, sẽ được sao chép bằng JavaScript -->
+                                    <tr id="productRowTemplate" style="display: none;">
+                                        <td>
+                                            <select class="form-control product-select" name="productId" required>
+                                                <option value="">-- Chọn sản phẩm --</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input type="number" class="form-control text-end product-quantity" name="quantity" value="1" min="1" required />
+                                        </td>
+                                        <td>
+                                            <input type="number" class="form-control text-end product-price" name="unitPrice" value="0" min="0" required />
+                                        </td>
+                                        <td>
+                                            <input type="number" class="form-control text-end product-discount" name="discountPercentage" value="0" min="0" max="100" />
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control text-end product-subtotal" value="0" readonly />
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control warehouse-location" name="warehouseLocation" />
+                                        </td>
+                                        <td class="text-center">
+                                            <button type="button" class="btn btn-sm btn-danger btn-remove-product">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th colspan="4" class="text-end">Tổng cộng:</th>
+                                        <th class="text-end" id="grandTotal">0 đ</th>
+                                        <th colspan="2"></th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
+                    <button type="submit" class="btn btn-primary">Lưu đơn hàng</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+        <script>
+            $(document).ready(function () {
+                // Lưu trữ danh sách sản phẩm
+                var products = @Html.Raw(Json.Serialize(ViewBag.Products));
+        
+                // Hàm định dạng số
+                function formatCurrency(value) {
+                    return new Intl.NumberFormat('vi-VN').format(value) + ' đ';
+                }
+        
+                // Hàm tính tổng tiền
+                function calculateTotal() {
+                    var grandTotal = 0;
+                    $('#productTable tbody tr:visible').each(function() {
+                        var quantity = parseFloat($(this).find('.product-quantity').val()) || 0;
+                        var price = parseFloat($(this).find('.product-price').val()) || 0;
+                        var discount = parseFloat($(this).find('.product-discount').val()) || 0;
+                    
+                        var subtotal = quantity * price;
+                        var discountAmount = subtotal * (discount / 100);
+                        var total = subtotal - discountAmount;
+                    
+                        $(this).find('.product-subtotal').val(formatCurrency(total));
+                        grandTotal += total;
+                    });
+                
+                    $('#grandTotal').text(formatCurrency(grandTotal));
+                }
+            
+                // Hàm thêm dòng sản phẩm mới
+                function addProductRow() {
+                    var $template = $('#productRowTemplate');
+                    var $newRow = $template.clone().removeAttr('id').show();
+                
+                    // Thêm các sản phẩm vào dropdown
+                    var $select = $newRow.find('.product-select');
+                    $.each(products, function(i, product) {
+                        $select.append($('<option>', {
+                            value: product.id,
+                            text: product.productCode + ' - ' + product.name,
+                            'data-price': product.purchasePrice,
+                            'data-location': product.warehouseLocation || ''
+                        }));
+                    });
+                
+                    // Xử lý sự kiện khi chọn sản phẩm
+                    $select.on('change', function() {
+                        var selectedOption = $(this).find('option:selected');
+                        var price = selectedOption.data('price') || 0;
+                        var location = selectedOption.data('location') || '';
+                    
+                        var $row = $(this).closest('tr');
+                        $row.find('.product-price').val(price);
+                        $row.find('.warehouse-location').val(location);
+                        calculateTotal();
+                    });
+                
+                    // Xử lý sự kiện khi thay đổi số lượng, đơn giá hoặc chiết khấu
+                    $newRow.find('.product-quantity, .product-price, .product-discount').on('input', calculateTotal);
+                
+                    // Xử lý sự kiện khi xóa dòng
+                    $newRow.find('.btn-remove-product').on('click', function() {
+                        $(this).closest('tr').remove();
+                        calculateTotal();
+                    });
+                
+                    // Thêm dòng mới vào bảng
+                    $('#productTable tbody').append($newRow);
+                }
+            
+                // Thêm dòng sản phẩm đầu tiên
+                addProductRow();
+            
+                // Xử lý sự kiện khi nhấn nút thêm sản phẩm
+                $('#btnAddProduct').on('click', addProductRow);
+            
+                // Xử lý sự kiện submit form
+                $('#createPurchaseOrderForm').on('submit', function(event) {
+                    // Kiểm tra xem có ít nhất một sản phẩm được thêm vào không
+                    if ($('#productTable tbody tr:visible').length === 0) {
+                        alert('Vui lòng thêm ít nhất một sản phẩm vào đơn hàng');
+                        event.preventDefault();
+                        return false;
+                    }
+                
+                    // Kiểm tra xem tất cả các sản phẩm đã được chọn chưa
+                    var valid = true;
+                    $('#productTable tbody tr:visible').each(function() {
+                        var productId = $(this).find('.product-select').val();
+                        if (!productId) {
+                            valid = false;
+                            $(this).find('.product-select').addClass('is-invalid');
+                        } else {
+                            $(this).find('.product-select').removeClass('is-invalid');
+                        }
+                    });
+                
+                    if (!valid) {
+                        alert('Vui lòng chọn sản phẩm cho tất cả các dòng');
+                        event.preventDefault();
+                        return false;
+                    }
+                });
+            });
+        </script>
+}

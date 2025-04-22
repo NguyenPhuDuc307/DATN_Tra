@@ -1,0 +1,159 @@
+@model DehaAccountingMvc.Models.Accounting.InventoryMovement
+
+@{
+    ViewData["Title"] = "Chi tiết phiếu nhập xuất kho";
+}
+
+<h1>Chi tiết phiếu nhập xuất kho</h1>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Thông tin phiếu #@Model.MovementCode</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="mb-2">
+                            <strong>@Html.DisplayNameFor(model => model.MovementCode):</strong>
+                            <span>@Html.DisplayFor(model => model.MovementCode)</span>
+                        </div>
+                        <div class="mb-2">
+                            <strong>@Html.DisplayNameFor(model => model.MovementDate):</strong>
+                            <span>@Model.MovementDate.ToString("dd/MM/yyyy")</span>
+                        </div>
+                        <div class="mb-2">
+                            <strong>@Html.DisplayNameFor(model => model.MovementType):</strong>
+                            <span>@Html.DisplayFor(model => model.MovementType)</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-2">
+                            <strong>@Html.DisplayNameFor(model => model.Product):</strong>
+                            <span>@(Model.Product?.ProductCode + " - " + Model.Product?.Name)</span>
+                        </div>
+                        <div class="mb-2">
+                            <strong>@Html.DisplayNameFor(model => model.Quantity):</strong>
+                            <span>@Html.DisplayFor(model => model.Quantity) @(Model.Product?.Unit)</span>
+                        </div>
+                        <div class="mb-2">
+                            <strong>@Html.DisplayNameFor(model => model.WarehouseLocation):</strong>
+                            <span>@Html.DisplayFor(model => model.WarehouseLocation)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <div class="alert alert-info">
+                            <div class="mb-2">
+                                <strong>Tồn kho trước:</strong>
+                                <span>@Html.DisplayFor(model => model.BeforeQuantity) @(Model.Product?.Unit)</span>
+                            </div>
+                            <div class="mb-2">
+                                <strong>Tồn kho sau:</strong>
+                                <span>@Html.DisplayFor(model => model.AfterQuantity) @(Model.Product?.Unit)</span>
+                            </div>
+                            <div class="mb-2">
+                                <strong>Thay đổi:</strong>
+                                <span class="@(Model.AfterQuantity > Model.BeforeQuantity ? "text-success" : "text-danger")">
+                                    @(Model.AfterQuantity > Model.BeforeQuantity ? "+" : "")@(Model.AfterQuantity - Model.BeforeQuantity) @(Model.Product?.Unit)
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @if (Model.PurchaseOrder != null)
+                {
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <div class="alert alert-success">
+                                <h6 class="mb-2">Đơn mua hàng liên quan</h6>
+                                <div class="mb-1">
+                                    <strong>Mã đơn:</strong>
+                                    <span>@Model.PurchaseOrder.OrderNumber</span>
+                                </div>
+                                <div class="mb-1">
+                                    <strong>Ngày đặt:</strong>
+                                    <span>@Model.PurchaseOrder.OrderDate.ToString("dd/MM/yyyy")</span>
+                                </div>
+                                <div class="mb-1">
+                                    <strong>Nhà cung cấp:</strong>
+                                    <span>@Model.PurchaseOrder.Supplier?.Name</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                @if (Model.SalesOrder != null)
+                {
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <div class="alert alert-info">
+                                <h6 class="mb-2">Đơn bán hàng liên quan</h6>
+                                <div class="mb-1">
+                                    <strong>Mã đơn:</strong>
+                                    <span>@Model.SalesOrder.OrderNumber</span>
+                                </div>
+                                <div class="mb-1">
+                                    <strong>Ngày đặt:</strong>
+                                    <span>@Model.SalesOrder.OrderDate.ToString("dd/MM/yyyy")</span>
+                                </div>
+                                <div class="mb-1">
+                                    <strong>Khách hàng:</strong>
+                                    <span>@Model.SalesOrder.Customer?.Name</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(Model.Notes))
+                {
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <div class="alert alert-secondary">
+                                <h6 class="mb-2">Ghi chú</h6>
+                                <p>@Html.DisplayFor(model => model.Notes)</p>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="alert alert-light">
+                            <div class="mb-1">
+                                <strong>Ngày tạo:</strong>
+                                <span>@Model.CreatedDate.ToString("dd/MM/yyyy HH:mm")</span>
+                            </div>
+                            <div class="mb-1">
+                                <strong>Người tạo:</strong>
+                                <span>@Html.DisplayFor(model => model.CreatedBy)</span>
+                            </div>
+                            @if (Model.UpdatedDate.HasValue)
+                            {
+                                <div class="mb-1">
+                                    <strong>Cập nhật lần cuối:</strong>
+                                    <span>@Model.UpdatedDate.Value.ToString("dd/MM/yyyy HH:mm")</span>
+                                </div>
+                                <div class="mb-1">
+                                    <strong>Người cập nhật:</strong>
+                                    <span>@Html.DisplayFor(model => model.UpdatedBy)</span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning me-2">Sửa</a>
+            <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
+        </div>
+    </div>
+</div> 

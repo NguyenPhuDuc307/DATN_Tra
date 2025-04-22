@@ -1,0 +1,16 @@
+1. Tính cấp thiết của đề tài nghiên cứu
+Trong bối cảnh kinh tế ngày càng cạnh tranh, việc áp dụng các công nghệ hiện đại vào quản lý doanh nghiệp trở nên vô cùng cấp thiết. Các doanh nghiệp đang phải đối mặt với sự cạnh tranh khốc liệt và nhu cầu tối ưu hóa quy trình kinh doanh ngày càng cao. Việc phát triển phần mềm kế toán bán hàng giúp tự động hóa và chính xác hóa các công việc kế toán, giúp giảm thiểu sai sót và tăng cường hiệu suất làm việc của nhân viên. Từ đó nâng cao hiệu quả công việc và tiết kiệm thời gian, công sức. 
+Ngoài ra, phần mềm kế toán giúp quản lý chính xác các giao dịch bán hàng, hàng tồn kho và công nợ. Điều này giúp doanh nghiệp có cái nhìn tổng quan và chính xác về tình hình tài chính, từ đó đưa ra các quyết định kinh doanh hợp lý. Việc tự động hóa các quy trình kế toán không chỉ giảm thiểu sai sót mà còn giảm bớt sự phụ thuộc vào nhân lực. Điều này giúp doanh nghiệp tiết kiệm được chi phí nhân công và các chi phí liên quan khác.
+Phần mềm kế toán cung cấp các báo cáo tài chính chi tiết và kịp thời, hỗ trợ ban lãnh đạo trong việc ra quyết định kinh doanh. Các báo cáo này giúp doanh nghiệp nhận diện được các vấn đề, cơ hội và thách thức một cách nhanh chóng và chính xác. Hơn nữa, phần mềm kế toán đảm bảo doanh nghiệp tuân thủ các quy định về kế toán và thuế theo pháp luật hiện hành. Điều này giúp doanh nghiệp tránh được các rủi ro pháp lý và đảm bảo hoạt động kinh doanh bền vững.
+Do đó, việc phân tích, thiết kế và xây dựng phần mềm kế toán bán hàng tại Công ty Cổ phần DEHA Việt Nam không chỉ giúp doanh nghiệp hoạt động hiệu quả hơn mà còn tạo điều kiện thuận lợi cho việc phát triển và mở rộng thị trường. Đây là bước đi quan trọng và cấp thiết để nâng cao năng lực cạnh tranh và đạt được sự phát triển bền vững trong thời đại công nghệ 4.0.
+2. Đối tượng và mục đích nghiên cứu 
+Đối tượng nghiên cứu của đề tài: các quy trình kế toán bán hàng tại Công ty Cổ phần DEHA Việt Nam, bao gồm việc quản lý giao dịch bán hàng, hàng tồn kho, công nợ và báo cáo tài chính. 
+Mục tiêu nghiên cứu: Xây dựng phần mềm kế toán bán hàng hiệu quả, đáp ứng các yêu cầu quản lý tài chính của công ty. Kết quả cuối cùng là một hệ thống phần mềm hoàn chỉnh, giúp doanh nghiệp nâng cao hiệu suất làm việc, quản lý chính xác và tiết kiệm chi phí.
+3. Phạm vi nghiên cứu: 
+	Thời gian: Nghiên cứu về quy trình bán hàng của Công ty Cổ phần DEHA từ năm 2019-2024
+	Không gian: Nghiên cứu bao gồm Công ty Cổ phần DEHA Việt Nam và có thể mở rộng nghiên cứu tại các doanh nghiệp khác trong cùng ngành tại Việt Nam.
+4. Phương pháp nghiên cứu: 
+- Phương Pháp Phân Tích Hệ Thống: Sử dụng phương pháp phân tích hệ thống để xác định các yêu cầu của phần mềm kế toán, bao gồm các quy trình kế toán và các chức năng cần thiết của phần mềm.
+- Phương Pháp Thiết Kế Phần Mềm: Áp dụng phương pháp thiết kế phần mềm hướng đối tượng và thiết kế giao diện người dùng để đảm bảo phần mềm dễ sử dụng và hiệu quả.
+- Phương Pháp Kiểm Thử: Sử dụng các phương pháp kiểm thử phần mềm như kiểm thử đơn vị, kiểm thử tích hợp và kiểm thử hệ thống để đảm bảo phần mềm hoạt động chính xác và ổn định.
+- Phương Pháp Thu Thập Dữ Liệu: Sử dụng phương pháp khảo sát và phỏng vấn để thu thập thông tin từ các bộ phận liên quan trong công ty.

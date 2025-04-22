@@ -1,0 +1,146 @@
+@model DehaAccountingMvc.Models.Accounting.PurchaseOrder
+
+@{
+    ViewData["Title"] = "Xóa đơn mua hàng";
+}
+
+<div class="container-fluid p-3">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 font-weight-bold text-primary">@ViewData["Title"]</h6>
+            <div class="dropdown no-arrow">
+                <a href="@Url.Action("Details", new { id = Model.Id })" class="btn btn-sm btn-secondary shadow-sm">
+                    <i class="fas fa-arrow-left fa-sm text-white-50"></i> Quay lại chi tiết
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            @if (TempData["ErrorMessage"] != null)
+            {
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        @TempData["ErrorMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+            }
+
+            <div class="alert alert-danger mb-4">
+                <h4 class="alert-heading">Bạn có chắc chắn muốn xóa đơn hàng này?</h4>
+                <p>Hành động này không thể phục hồi. Tất cả dữ liệu liên quan đến đơn hàng này sẽ bị xóa vĩnh viễn.</p>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="m-0 font-weight-bold text-primary">Thông tin đơn hàng</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3 row">
+                                <label class="col-sm-4 col-form-label">@Html.DisplayNameFor(model => model.OrderNumber):</label>
+                                <div class="col-sm-8 col-form-label">
+                                    <span class="fw-bold">@Html.DisplayFor(model => model.OrderNumber)</span>
+                                </div>
+                            </div>
+                            <div class="mb-3 row">
+                                <label class="col-sm-4 col-form-label">@Html.DisplayNameFor(model => model.OrderDate):</label>
+                                <div class="col-sm-8 col-form-label">
+                                    @Html.DisplayFor(model => model.OrderDate)
+                                </div>
+                            </div>
+                            <div class="mb-3 row">
+                                <label class="col-sm-4 col-form-label">@Html.DisplayNameFor(model => model.Supplier):</label>
+                                <div class="col-sm-8 col-form-label">
+                                    @Html.DisplayFor(model => model.Supplier.Name)
+                                </div>
+                            </div>
+                            <div class="mb-3 row">
+                                <label class="col-sm-4 col-form-label">@Html.DisplayNameFor(model => model.Status):</label>
+                                <div class="col-sm-8 col-form-label">
+                                    <span class="badge @GetStatusBadgeClass(Model.Status)">
+                                        @Html.DisplayFor(model => model.Status)
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="m-0 font-weight-bold text-primary">Thông tin tài chính</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3 row">
+                                <label class="col-sm-4 col-form-label">@Html.DisplayNameFor(model => model.SubTotal):</label>
+                                <div class="col-sm-8 col-form-label">
+                                    @Model.SubTotal.ToString("N0") đ
+                                </div>
+                            </div>
+                            <div class="mb-3 row">
+                                <label class="col-sm-4 col-form-label">@Html.DisplayNameFor(model => model.GrandTotal):</label>
+                                <div class="col-sm-8 col-form-label">
+                                    <span class="fw-bold">@Model.GrandTotal.ToString("N0") đ</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chi tiết đơn hàng -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="m-0 font-weight-bold text-primary">Chi tiết đơn hàng</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover" width="100%" cellspacing="0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Mã sản phẩm</th>
+                                    <th>Tên sản phẩm</th>
+                                    <th class="text-end">Số lượng</th>
+                                    <th class="text-end">Đơn giá</th>
+                                    <th class="text-end">Thành tiền</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.PurchaseOrderDetails)
+                                {
+                                        <tr>
+                                            <td>@item.Product.ProductCode</td>
+                                            <td>@item.Product.Name</td>
+                                            <td class="text-end">@item.Quantity</td>
+                                            <td class="text-end">@item.UnitPrice.ToString("N0") đ</td>
+                                            <td class="text-end">@item.Total.ToString("N0") đ</td>
+                                        </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <form asp-action="Delete" class="d-flex justify-content-between">
+                <input type="hidden" asp-for="Id" />
+                <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-secondary">Quay lại chi tiết</a>
+                <button type="submit" class="btn btn-danger">Xác nhận xóa</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@functions {
+    public string GetStatusBadgeClass(DehaAccountingMvc.Models.Accounting.PurchaseOrderStatus status)
+    {
+        return status switch
+        {
+            DehaAccountingMvc.Models.Accounting.PurchaseOrderStatus.New => "bg-primary",
+            DehaAccountingMvc.Models.Accounting.PurchaseOrderStatus.Approved => "bg-info",
+            DehaAccountingMvc.Models.Accounting.PurchaseOrderStatus.PartiallyReceived => "bg-warning",
+            DehaAccountingMvc.Models.Accounting.PurchaseOrderStatus.FullyReceived => "bg-success",
+            DehaAccountingMvc.Models.Accounting.PurchaseOrderStatus.Cancelled => "bg-danger",
+            _ => "bg-secondary"
+        };
+    }
+}

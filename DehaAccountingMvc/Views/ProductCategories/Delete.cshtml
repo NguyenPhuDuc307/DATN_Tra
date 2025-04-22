@@ -1,0 +1,87 @@
+@model DehaAccountingMvc.Models.Accounting.ProductCategory
+
+@{
+    ViewData["Title"] = "Xóa danh mục sản phẩm";
+}
+
+<div class="container-fluid pt-4 px-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="bg-light rounded p-4">
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <h5 class="mb-0">@ViewData["Title"]</h5>
+                    <a asp-action="Index" class="btn btn-secondary"><i class="fa fa-arrow-left me-1"></i>Quay lại</a>
+                </div>
+
+                <div asp-validation-summary="All" class="text-danger"></div>
+
+                <div class="alert alert-warning">
+                    <h6 class="fw-bold mb-3">Bạn có chắc chắn muốn xóa danh mục sản phẩm này?</h6>
+                    <p>Thao tác này không thể hoàn tác.</p>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="fw-bold">@Html.DisplayNameFor(model => model.CategoryCode):</label>
+                            <div>@Html.DisplayFor(model => model.CategoryCode)</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="fw-bold">@Html.DisplayNameFor(model => model.Name):</label>
+                            <div>@Html.DisplayFor(model => model.Name)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="fw-bold">@Html.DisplayNameFor(model => model.ParentCategory):</label>
+                            <div>@(Model.ParentCategory != null ? Model.ParentCategory.Name : "Không có")</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="fw-bold">@Html.DisplayNameFor(model => model.DisplayOrder):</label>
+                            <div>@Html.DisplayFor(model => model.DisplayOrder)</div>
+                        </div>
+                    </div>
+                </div>
+
+                @if (Model.ChildCategories != null && Model.ChildCategories.Any())
+                {
+                    <div class="alert alert-danger">
+                        <p><i class="fa fa-exclamation-triangle me-2"></i>Không thể xóa danh mục này vì có
+                            @Model.ChildCategories.Count danh mục con.</p>
+                    </div>
+                }
+
+                @if (Model.Products != null && Model.Products.Any())
+                {
+                    <div class="alert alert-danger">
+                        <p><i class="fa fa-exclamation-triangle me-2"></i>Không thể xóa danh mục này vì có
+                            @Model.Products.Count sản phẩm thuộc danh mục.</p>
+                    </div>
+                }
+
+                <form asp-action="Delete" method="post">
+                    <input type="hidden" asp-for="Id" />
+                    <div class="d-flex justify-content-end mt-3">
+                        <a asp-action="Index" class="btn btn-secondary me-2">Hủy</a>
+                        @if ((Model.ChildCategories == null || !Model.ChildCategories.Any()) &&
+                                                (Model.Products == null || !Model.Products.Any()))
+                        {
+                            <button type="submit" class="btn btn-danger">Xóa</button>
+                        }
+                        else
+                        {
+                            <button type="button" class="btn btn-danger" disabled>Xóa</button>
+                        }
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

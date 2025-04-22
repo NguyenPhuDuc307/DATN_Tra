@@ -1,0 +1,105 @@
+# Cursor Rules for DEHA Accounting System
+
+## Project Structure Rules
+- Use ASP.NET Core 10.0 with MVC architecture pattern
+- Organize code by features/modules first, then by architectural components
+- Place shared code in a Common or Shared folder
+- Use Controllers directly with ApplicationDbContext, no services or repositories
+- Ưu tiên tốc độ phát triển và mã nguồn dễ hiểu
+- Sử dụng scaffolding và các template có sẵn khi có thể
+
+## Naming Conventions
+- **Classes**: PascalCase (e.g., `InvoiceController`)
+- **Methods**: PascalCase (e.g., `GetInvoiceById`)
+- **Models**: PascalCase, singular (e.g., `Invoice`)
+- **DbSets**: PascalCase, plural (e.g., `Invoices`)
+- **Private variables**: camelCase with underscore prefix (e.g., `_context`)
+- **Public properties**: PascalCase (e.g., `InvoiceDate`)
+- **Database tables**: PascalCase, plural (e.g., `Invoices`)
+- **ViewModels**: PascalCase, suffix with ViewModel (e.g., `ProductListViewModel`)
+
+## Coding Standards
+- Use async/await for database operations
+- Add comments cho code phức tạp
+- Implement basic error handling
+- Always validate user input
+- Use strongly typed ViewModels for all views
+- Use Data Annotations for model validation
+- Focus on readability and maintainability over optimization
+- Ưu tiên việc code đơn giản, dễ hiểu và dễ bảo trì
+- Sử dụng transactions cho các thao tác phức tạp cập nhật nhiều entities
+- Sử dụng view bags chỉ khi cần thiết, ưu tiên dùng view models
+
+## Database Rules
+- Use EF Core Code-First approach
+- Create separate migration files for each significant change
+- Use Data Annotations for simple constraints
+- Use Fluent API for complex relationships
+- Implement soft delete when appropriate
+- Avoid raw SQL except for complex queries
+- Tối ưu các truy vấn với Include và eager loading thông minh
+- Tránh N+1 query problem bằng cách include các related entities
+
+## ApplicationDbContext Rules
+- Register DbContext with dependency injection
+- Configure entity relationships in OnModelCreating
+- Use proper data types and constraints
+- Include seed data when appropriate
+- Use migrations for schema changes
+- Extend IdentityDbContext cho Authentication mặc định
+
+## Controller Rules
+- Keep controllers focused on specific features
+- Use ApplicationDbContext directly in controllers
+- Implement basic error handling
+- Return appropriate HTTP status codes
+- Use async methods for database operations
+- Keep business logic in controllers
+- Sử dụng try-catch blocks cho các thao tác có thể phát sinh lỗi
+- Sử dụng transactions khi cập nhật nhiều bảng liên quan
+
+## View Rules
+- Use Razor syntax for views
+- Create partial views for reusable components
+- Use strongly typed models
+- Use _ViewImports.cshtml for common using statements
+- Use _Layout.cshtml for common layout
+- Implement client-side validation
+- Tạo components chung cho navbar, sidebar, footer
+- Sử dụng card-based layout cho tất cả các views
+- Tạo partial views cho các form phức tạp
+- Sử dụng client-side validation với jQuery validation
+
+## Basic Security Rules
+- Never store passwords in plaintext
+- Sử dụng ASP.NET Core Identity scaffolding cho Authentication
+- Sử dụng Identity mặc định cho đăng nhập, đăng ký, quản lý tài khoản
+- Thêm các role cơ bản vào Identity (Admin, User, Manager, etc.)
+- Implement basic authorization checks với [Authorize] attribute
+- Validate input data for obvious security issues
+
+## UI/UX Rules
+- Use Bootstrap 5 for consistent styling
+- Ensure responsive design for all views
+- Use meaningful error messages
+- Implement client-side validation for better user experience
+- Sử dụng các trang Identity mặc định cho đăng nhập, đăng ký
+- Sử dụng Bootstrap Icons cho các biểu tượng
+- Tạo card-based layout cho các form và danh sách
+- Sử dụng màu sắc đồng nhất trong toàn bộ ứng dụng
+- Thêm visual indicators cho trạng thái đơn hàng và báo cáo
+- Các bảng dữ liệu nên có header cố định và phân trang
+
+## Development Workflow
+- Use Git for version control
+- Document significant changes
+- Keep code clean and readable
+- Commit regularly with meaningful messages
+- Cập nhật Memory Bank sau khi hoàn thành một module hoặc thay đổi lớn
+
+## Documentation
+- Keep Memory Bank up to date with significant changes
+- Document database schema
+- Add comments to complex code blocks
+- Use meaningful commit messages 
+- Cập nhật activeContext.md và progress.md sau mỗi lần hoàn thành một chức năng lớn 

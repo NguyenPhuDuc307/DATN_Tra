@@ -1,0 +1,152 @@
+@model DehaAccountingMvc.Models.Accounting.Customer
+
+@{
+    ViewData["Title"] = "Thêm mới khách hàng";
+}
+
+<div class="card shadow-sm mb-3">
+    <div class="card-header bg-white py-3">
+        <h5 class="m-0 font-weight-bold text-primary">@ViewData["Title"]</h5>
+    </div>
+    <div class="card-body">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="CustomerCode" class="control-label"></label>
+                        <input asp-for="CustomerCode" class="form-control" />
+                        <span asp-validation-for="CustomerCode" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="CustomerType" class="control-label"></label>
+                        <select asp-for="CustomerType" class="form-select"
+                            asp-items="Html.GetEnumSelectList<DehaAccountingMvc.Models.Accounting.CustomerType>()"></select>
+                        <span asp-validation-for="CustomerType" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Address" class="control-label"></label>
+                <input asp-for="Address" class="form-control" />
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="Phone" class="control-label"></label>
+                        <input asp-for="Phone" class="form-control" />
+                        <span asp-validation-for="Phone" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="Email" class="control-label"></label>
+                        <input asp-for="Email" class="form-control" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="TaxCode" class="control-label"></label>
+                        <input asp-for="TaxCode" class="form-control" />
+                        <span asp-validation-for="TaxCode" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="ContactPerson" class="control-label"></label>
+                        <input asp-for="ContactPerson" class="form-control" />
+                        <span asp-validation-for="ContactPerson" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <h6 class="font-weight-bold mt-4 mb-3">Thông tin ngân hàng</h6>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group mb-3">
+                        <label asp-for="BankAccount" class="control-label"></label>
+                        <input asp-for="BankAccount" class="form-control" />
+                        <span asp-validation-for="BankAccount" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group mb-3">
+                        <label asp-for="BankName" class="control-label"></label>
+                        <input asp-for="BankName" class="form-control" />
+                        <span asp-validation-for="BankName" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group mb-3">
+                        <label asp-for="BankBranch" class="control-label"></label>
+                        <input asp-for="BankBranch" class="form-control" />
+                        <span asp-validation-for="BankBranch" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <h6 class="font-weight-bold mt-4 mb-3">Thông tin tài chính</h6>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group mb-3">
+                        <label asp-for="PaymentTerms" class="control-label"></label>
+                        <input asp-for="PaymentTerms" class="form-control" />
+                        <span asp-validation-for="PaymentTerms" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group mb-3">
+                        <label asp-for="CurrentDebt" class="control-label"></label>
+                        <input asp-for="CurrentDebt" class="form-control" />
+                        <span asp-validation-for="CurrentDebt" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group mb-3">
+                        <label asp-for="DebtLimit" class="control-label"></label>
+                        <input asp-for="DebtLimit" class="form-control" />
+                        <span asp-validation-for="DebtLimit" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group form-check mb-3">
+                <input class="form-check-input" asp-for="IsActive" checked />
+                <label class="form-check-label" asp-for="IsActive"></label>
+            </div>
+
+            <div class="form-group d-flex justify-content-between mt-4">
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left me-1"></i> Quay lại
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save me-1"></i> Lưu
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

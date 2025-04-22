@@ -1,0 +1,145 @@
+@model DehaAccountingMvc.Models.Accounting.Customer
+
+@{
+    ViewData["Title"] = "Chi tiết khách hàng";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header bg-white py-3">
+        <div class="row align-items-center">
+            <div class="col">
+                <h5 class="m-0 font-weight-bold text-primary">@ViewData["Title"]</h5>
+            </div>
+            <div class="col text-end">
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
+                    <i class="bi bi-pencil-square me-1"></i> Chỉnh sửa
+                </a>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left me-1"></i> Quay lại
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-4">
+                    <h6 class="text-uppercase text-muted mb-2">Thông tin cơ bản</h6>
+                    <dl class="row">
+                        <dt class="col-sm-4">@Html.DisplayNameFor(model => model.CustomerCode)</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(model => model.CustomerCode)</dd>
+
+                        <dt class="col-sm-4">@Html.DisplayNameFor(model => model.Name)</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(model => model.Name)</dd>
+
+                        <dt class="col-sm-4">@Html.DisplayNameFor(model => model.CustomerType)</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(model => model.CustomerType)</dd>
+
+                        <dt class="col-sm-4">@Html.DisplayNameFor(model => model.Address)</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(model => model.Address)</dd>
+
+                        <dt class="col-sm-4">@Html.DisplayNameFor(model => model.Phone)</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(model => model.Phone)</dd>
+
+                        <dt class="col-sm-4">@Html.DisplayNameFor(model => model.Email)</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(model => model.Email)</dd>
+
+                        <dt class="col-sm-4">@Html.DisplayNameFor(model => model.TaxCode)</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(model => model.TaxCode)</dd>
+
+                        <dt class="col-sm-4">@Html.DisplayNameFor(model => model.ContactPerson)</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(model => model.ContactPerson)</dd>
+                    </dl>
+                </div>
+
+                <div class="mb-4">
+                    <h6 class="text-uppercase text-muted mb-2">Thông tin ngân hàng</h6>
+                    <dl class="row">
+                        <dt class="col-sm-4">@Html.DisplayNameFor(model => model.BankAccount)</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(model => model.BankAccount)</dd>
+
+                        <dt class="col-sm-4">@Html.DisplayNameFor(model => model.BankName)</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(model => model.BankName)</dd>
+
+                        <dt class="col-sm-4">@Html.DisplayNameFor(model => model.BankBranch)</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(model => model.BankBranch)</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="mb-4">
+                    <h6 class="text-uppercase text-muted mb-2">Thông tin tài chính</h6>
+                    <dl class="row">
+                        <dt class="col-sm-4">@Html.DisplayNameFor(model => model.CurrentDebt)</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(model => model.CurrentDebt)</dd>
+
+                        <dt class="col-sm-4">@Html.DisplayNameFor(model => model.DebtLimit)</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(model => model.DebtLimit)</dd>
+
+                        <dt class="col-sm-4">@Html.DisplayNameFor(model => model.PaymentTerms)</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(model => model.PaymentTerms)</dd>
+                    </dl>
+                </div>
+
+                <div class="mb-4">
+                    <h6 class="text-uppercase text-muted mb-2">Thông tin hệ thống</h6>
+                    <dl class="row">
+                        <dt class="col-sm-4">@Html.DisplayNameFor(model => model.IsActive)</dt>
+                        <dd class="col-sm-8">
+                            @if (Model.IsActive)
+                            {
+                                <span class="badge bg-success text-white">Hoạt động</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary text-white">Ngừng hoạt động</span>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-4">@Html.DisplayNameFor(model => model.CreatedDate)</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(model => model.CreatedDate)</dd>
+
+                        <dt class="col-sm-4">@Html.DisplayNameFor(model => model.CreatedBy)</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(model => model.CreatedBy)</dd>
+
+                        <dt class="col-sm-4">@Html.DisplayNameFor(model => model.UpdatedDate)</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(model => model.UpdatedDate)</dd>
+
+                        <dt class="col-sm-4">@Html.DisplayNameFor(model => model.UpdatedBy)</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(model => model.UpdatedBy)</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-4">
+    <h5 class="mb-3">Thông tin liên quan</h5>
+    <ul class="nav nav-tabs" id="customerTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="orders-tab" data-bs-toggle="tab" data-bs-target="#orders" type="button"
+                role="tab" aria-controls="orders" aria-selected="true">Đơn hàng</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="invoices-tab" data-bs-toggle="tab" data-bs-target="#invoices" type="button"
+                role="tab" aria-controls="invoices" aria-selected="false">Hóa đơn</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="payments-tab" data-bs-toggle="tab" data-bs-target="#payments" type="button"
+                role="tab" aria-controls="payments" aria-selected="false">Thanh toán</button>
+        </li>
+    </ul>
+    <div class="tab-content p-3 border border-top-0 rounded-bottom" id="customerTabsContent">
+        <div class="tab-pane fade show active" id="orders" role="tabpanel" aria-labelledby="orders-tab">
+            <p class="text-muted">Không có đơn hàng nào.</p>
+        </div>
+        <div class="tab-pane fade" id="invoices" role="tabpanel" aria-labelledby="invoices-tab">
+            <p class="text-muted">Không có hóa đơn nào.</p>
+        </div>
+        <div class="tab-pane fade" id="payments" role="tabpanel" aria-labelledby="payments-tab">
+            <p class="text-muted">Không có thanh toán nào.</p>
+        </div>
+    </div>
+</div>

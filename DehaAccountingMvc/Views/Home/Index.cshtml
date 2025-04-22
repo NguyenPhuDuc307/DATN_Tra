@@ -1,0 +1,298 @@
+﻿@using DehaAccountingMvc.Models.Accounting
+@{
+    ViewData["Title"] = "Bảng điều khiển";
+}
+
+<div class="container-fluid px-4">
+    <!-- Tiêu đề trang -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-0">@ViewData["Title"]</h2>
+            <p class="text-muted mb-0">Chào mừng đến với hệ thống quản lý kế toán Deha</p>
+        </div>
+        <div>
+            <span class="badge bg-primary bg-opacity-10 text-primary py-2 px-3">
+                <i class="bi bi-calendar-event me-1"></i>
+                @DateTime.Now.ToString("dd/MM/yyyy")
+            </span>
+        </div>
+    </div>
+
+    <!-- Các thẻ tổng quan -->
+    <partial name="_SummaryCards" />
+
+    <!-- Biểu đồ thống kê -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm rounded-3">
+                <div class="card-body">
+                    <partial name="_StatisticsCharts" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <!-- Thông tin sản phẩm -->
+        <div class="col-lg-6 mb-4 mb-lg-0">
+            <div class="card border-0 shadow-sm rounded-3 h-100">
+                <div class="card-header bg-transparent border-0 pb-0">
+                    <h5 class="fw-bold mb-0">Thông tin sản phẩm</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="nav nav-tabs nav-fill mb-3" id="productTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="top-selling-tab" data-bs-toggle="tab"
+                                data-bs-target="#top-selling" type="button" role="tab" aria-controls="top-selling"
+                                aria-selected="true">
+                                Bán chạy
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="low-stock-tab" data-bs-toggle="tab" data-bs-target="#low-stock"
+                                type="button" role="tab" aria-controls="low-stock" aria-selected="false">
+                                Sắp hết hàng
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="productTabsContent">
+                        <!-- Tab sản phẩm bán chạy -->
+                        <div class="tab-pane fade show active" id="top-selling" role="tabpanel"
+                            aria-labelledby="top-selling-tab">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th scope="col">Sản phẩm</th>
+                                            <th scope="col">Số lượng</th>
+                                            <th scope="col">Doanh thu</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (ViewBag.TopSellingProducts != null)
+                                        {
+                                            @foreach (var product in ViewBag.TopSellingProducts)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="bg-light rounded p-2 me-2">
+                                                                <i class="bi bi-box text-primary"></i>
+                                                            </div>
+                                                            <div>
+                                                                <div class="fw-medium">@product.Name</div>
+                                                                <div class="small text-muted">@product.Code</div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td>@product.QuantitySold</td>
+                                                    <td>@product.Revenue.ToString("N0") đ</td>
+                                                </tr>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td colspan="3" class="text-center py-3">
+                                                    <div class="text-muted">Không có dữ liệu sản phẩm bán chạy</div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Tab sản phẩm sắp hết hàng -->
+                        <div class="tab-pane fade" id="low-stock" role="tabpanel" aria-labelledby="low-stock-tab">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th scope="col">Sản phẩm</th>
+                                            <th scope="col">Tồn kho</th>
+                                            <th scope="col">Trạng thái</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (ViewBag.LowStockProducts != null)
+                                        {
+                                            @foreach (var product in ViewBag.LowStockProducts)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="bg-light rounded p-2 me-2">
+                                                                <i class="bi bi-box text-primary"></i>
+                                                            </div>
+                                                            <div>
+                                                                <div class="fw-medium">@product.Name</div>
+                                                                <div class="small text-muted">@product.Code</div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td>@product.StockQuantity</td>
+                                                    <td>
+                                                        @if (product.StockQuantity <= 5)
+                                                        {
+                                                            <span class="badge bg-danger">Cần nhập hàng</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="badge bg-warning text-dark">Sắp hết</span>
+                                                        }
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td colspan="3" class="text-center py-3">
+                                                    <div class="text-muted">Không có sản phẩm sắp hết hàng</div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0 pt-0">
+                    <a href="/Products" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-arrow-right me-1"></i>Xem tất cả sản phẩm
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hoạt động gần đây -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm rounded-3 h-100">
+                <div class="card-header bg-transparent border-0 pb-0">
+                    <h5 class="fw-bold mb-0">Hoạt động gần đây</h5>
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.RecentActivities != null)
+                    {
+                        <div class="timeline">
+                            @foreach (var activity in ViewBag.RecentActivities)
+                            {
+                                <div class="timeline-item pb-3">
+                                    <div class="d-flex">
+                                        <div class="timeline-icon me-3">
+                                            @switch (activity.Type)
+                                            {
+                                                case "sale":
+                                                    <div class="rounded-circle bg-success bg-opacity-10 p-2">
+                                                        <i class="bi bi-bag-check text-success"></i>
+                                                    </div>
+                                                    break;
+                                                case "purchase":
+                                                    <div class="rounded-circle bg-primary bg-opacity-10 p-2">
+                                                        <i class="bi bi-truck text-primary"></i>
+                                                    </div>
+                                                    break;
+                                                case "inventory":
+                                                    <div class="rounded-circle bg-warning bg-opacity-10 p-2">
+                                                        <i class="bi bi-box-seam text-warning"></i>
+                                                    </div>
+                                                    break;
+                                                default:
+                                                    <div class="rounded-circle bg-info bg-opacity-10 p-2">
+                                                        <i class="bi bi-info-circle text-info"></i>
+                                                    </div>
+                                                    break;
+                                            }
+                                        </div>
+                                        <div class="timeline-content">
+                                            <div class="d-flex justify-content-between mb-1">
+                                                <span class="fw-medium">@activity.Title</span>
+                                                <span class="text-muted small">@activity.Time</span>
+                                            </div>
+                                            <p class="text-muted small mb-0">@activity.Description</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <div class="mb-3">
+                                <i class="bi bi-calendar-x text-muted" style="font-size: 2rem;"></i>
+                            </div>
+                            <p class="text-muted">Không có hoạt động nào gần đây</p>
+                        </div>
+                    }
+                </div>
+                <div class="card-footer bg-transparent border-0 pt-0">
+                    <a href="#" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-arrow-right me-1"></i>Xem tất cả hoạt động
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Nhất quán hóa giao diện */
+    .card {
+        border: none;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        border-radius: 0.5rem;
+        overflow: hidden;
+        margin-bottom: 0;
+    }
+
+    /* Đảm bảo viền của tất cả elements đồng nhất */
+    .alert,
+    .table,
+    .list-group {
+        margin-bottom: 0;
+        border-radius: 0;
+    }
+
+    /* Tabs đẹp hơn */
+    .nav-tabs {
+        border-bottom: none;
+    }
+
+    .nav-tabs .nav-link {
+        color: #6c757d;
+        font-weight: 500;
+        border: none;
+        padding: 0.75rem 1.25rem;
+    }
+
+    .nav-tabs .nav-link.active {
+        color: #0d6efd;
+        font-weight: 600;
+        border: none;
+        border-bottom: 3px solid #0d6efd;
+        background-color: transparent;
+    }
+
+    .nav-tabs .nav-link:hover {
+        border-color: transparent;
+    }
+
+    .tab-pane {
+        padding: 0;
+    }
+
+    /* Loại bỏ padding từ table trong card */
+    .card-body .table {
+        margin-bottom: 0;
+    }
+
+    /* Bỏ viền card footer */
+    .card-footer {
+        background-color: white;
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+    }
+</style>

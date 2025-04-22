@@ -1,0 +1,90 @@
+@using DehaAccountingMvc.Models.Accounting
+@{
+    var recentMovements = ViewBag.RecentMovements as IEnumerable<InventoryMovement> ?? new List<InventoryMovement>();
+}
+
+@if (recentMovements.Any())
+{
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th class="fw-medium">Mã phiếu</th>
+                    <th class="fw-medium">Sản phẩm</th>
+                    <th class="fw-medium text-center">Loại</th>
+                    <th class="fw-medium text-end">Số lượng</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var movement in recentMovements)
+                {
+                    var badgeClass = movement.MovementType switch
+                    {
+                        MovementType.PurchaseReceive => "bg-success",
+                        MovementType.SalesShipment => "bg-danger",
+                        MovementType.AdjustmentIn => "bg-warning",
+                        MovementType.AdjustmentOut => "bg-warning",
+                        MovementType.Stocktaking => "bg-info",
+                        _ => "bg-secondary"
+                    };
+
+                    var iconClass = movement.MovementType switch
+                    {
+                        MovementType.PurchaseReceive => "bi-arrow-down-circle",
+                        MovementType.SalesShipment => "bi-arrow-up-circle",
+                        MovementType.AdjustmentIn => "bi-arrow-repeat",
+                        MovementType.AdjustmentOut => "bi-arrow-repeat",
+                        MovementType.Stocktaking => "bi-plus-circle",
+                        _ => "bi-circle"
+                    };
+
+                    <tr>
+                        <td>
+                            <small class="badge bg-primary bg-opacity-10 text-primary">@movement.MovementCode</small>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <i class="bi bi-box text-primary"></i>
+                                </div>
+                                <div class="d-flex flex-column">
+                                    <span class="fw-medium">@movement.Product?.Name</span>
+                                    <small class="text-muted">@movement.MovementDate.ToString("dd/MM/yyyy")</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge @badgeClass">
+                                <i class="bi @iconClass me-1"></i>
+                                @movement.MovementType.ToString()
+                            </span>
+                        </td>
+                        <td class="text-end fw-medium">
+                            @if (movement.MovementType == MovementType.SalesShipment || movement.MovementType ==
+                                                MovementType.AdjustmentOut || movement.MovementType == MovementType.ReturnToVendor)
+                            {
+                                <span class="text-danger">-@movement.Quantity</span>
+                            }
+                            else
+                            {
+                                <span class="text-success">+@movement.Quantity</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="alert alert-info rounded-3 mb-0">
+        <div class="d-flex align-items-center">
+            <i class="bi bi-info-circle me-2 fs-4"></i>
+            <div>
+                <h6 class="mb-0">Không có dữ liệu</h6>
+                <p class="mb-0 text-muted small">Chưa có giao dịch nhập xuất kho nào</p>
+            </div>
+        </div>
+    </div>
+}

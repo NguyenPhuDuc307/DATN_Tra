@@ -1,0 +1,153 @@
+@model DehaAccountingMvc.Models.Accounting.InventoryMovement
+
+@{
+    ViewData["Title"] = "Chỉnh sửa phiếu nhập xuất kho";
+}
+
+<h1>Chỉnh sửa phiếu nhập xuất kho</h1>
+
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="BeforeQuantity" />
+            <input type="hidden" asp-for="CreatedBy" />
+            <input type="hidden" asp-for="CreatedDate" />
+
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Thông tin phiếu</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="MovementCode" class="form-label"></label>
+                            <input asp-for="MovementCode" class="form-control" />
+                            <span asp-validation-for="MovementCode" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="MovementDate" class="form-label"></label>
+                            <input asp-for="MovementDate" class="form-control" type="date" />
+                            <span asp-validation-for="MovementDate" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="MovementType" class="form-label"></label>
+                            <select asp-for="MovementType" asp-items="ViewBag.MovementTypes" class="form-select"
+                                id="movementTypeSelect">
+                                <option value="">-- Chọn loại di chuyển --</option>
+                            </select>
+                            <span asp-validation-for="MovementType" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="ProductId" class="form-label">Sản phẩm</label>
+                            <select asp-for="ProductId" asp-items="ViewBag.Products" class="form-select"
+                                id="productSelect">
+                                <option value="">-- Chọn sản phẩm --</option>
+                            </select>
+                            <span asp-validation-for="ProductId" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Quantity" class="form-label"></label>
+                            <input asp-for="Quantity" class="form-control" type="number" min="1" />
+                            <span asp-validation-for="Quantity" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="WarehouseLocation" class="form-label"></label>
+                            <input asp-for="WarehouseLocation" class="form-control" />
+                            <span asp-validation-for="WarehouseLocation" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4 purchase-order-section d-none">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Thông tin đơn mua hàng</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label asp-for="PurchaseOrderId" class="form-label">Đơn mua hàng</label>
+                            <select asp-for="PurchaseOrderId" asp-items="ViewBag.PurchaseOrders" class="form-select">
+                                <option value="">-- Chọn đơn mua hàng --</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4 sales-order-section d-none">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Thông tin đơn bán hàng</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label asp-for="SalesOrderId" class="form-label">Đơn bán hàng</label>
+                            <select asp-for="SalesOrderId" asp-items="ViewBag.SalesOrders" class="form-select">
+                                <option value="">-- Chọn đơn bán hàng --</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">Ghi chú</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label asp-for="Notes" class="form-label"></label>
+                        <textarea asp-for="Notes" class="form-control" rows="3"></textarea>
+                        <span asp-validation-for="Notes" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary me-2">Lưu thay đổi</button>
+                <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function () {
+            // Xử lý hiển thị/ẩn các section tùy theo loại di chuyển
+            $('#movementTypeSelect').change(function () {
+                const movementType = parseInt($(this).val());
+
+                // Ẩn tất cả các section đặc biệt trước
+                $('.purchase-order-section, .sales-order-section').addClass('d-none');
+
+                // Hiển thị section tương ứng
+                if (movementType === 0) { // PurchaseReceive
+                    $('.purchase-order-section').removeClass('d-none');
+                } else if (movementType === 1) { // SalesShipment
+                    $('.sales-order-section').removeClass('d-none');
+                } else if (movementType === 4) { // ReturnToVendor
+                    $('.purchase-order-section').removeClass('d-none');
+                } else if (movementType === 5) { // CustomerReturn
+                    $('.sales-order-section').removeClass('d-none');
+                }
+            });
+
+            // Trigger change event khi trang load để set trạng thái ban đầu
+            $('#movementTypeSelect').trigger('change');
+        });
+    </script>
+}

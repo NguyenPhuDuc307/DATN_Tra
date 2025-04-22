@@ -1,0 +1,180 @@
+@model DehaAccountingMvc.Models.Accounting.SalesOrder
+@using DehaAccountingMvc.Models.Accounting
+
+@{
+    ViewData["Title"] = "Xóa đơn bán hàng";
+}
+
+<div class="container-fluid p-3">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 font-weight-bold text-primary">@ViewData["Title"]</h6>
+            <div class="dropdown no-arrow">
+                <a href="@Url.Action("Details", new { id = Model.Id })" class="btn btn-sm btn-secondary shadow-sm">
+                    <i class="fas fa-arrow-left fa-sm text-white-50"></i> Quay lại chi tiết
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <div class="alert alert-danger mb-4">
+                <h4 class="alert-heading">Bạn có chắc chắn muốn xóa đơn hàng này?</h4>
+                <p>Hành động này không thể phục hồi. Tất cả dữ liệu liên quan đến đơn hàng này sẽ bị xóa vĩnh viễn.</p>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="m-0 font-weight-bold text-primary">Thông tin đơn hàng</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3 row">
+                                < class="col-sm-4 col-form-label">@Html.DisplayNameFor(model =>
+                                    model.OrderNumber):</ label >
+                                <div class="col-sm-8 col-form-label">
+                                    <span class="fw-bold">@Html.DisplayFor(model => model.OrderNumber)</span>
+                                </div>
+                            </div>
+                            <div class="mb-3 row">
+                                < class="col-sm-4 col-form-label">@Html.DisplayNameFor(model =>
+                                    model.OrderDate):</ label >
+                                <div class="col-sm-8 col-form-label">
+                                    @Html.DisplayFor(model => model.OrderDate)
+                                </div>
+                            </div>
+                            <div class="mb-3 row">
+                                < class="col-sm-4 col-form-label">@Html.DisplayNameFor(model =>
+                                    model.Customer):</ label >
+                                <div class="col-sm-8 col-form-label">
+                                    @Html.DisplayFor(model => model.Customer.Name)
+                                </div>
+                            </div>
+                            <div class="mb-3 row">
+                                < class="col-sm-4 col-form-label">@Html.DisplayNameFor(model =>
+                                    model.Status):</ label >
+                                <div class="col-sm-8 col-form-label">
+                                    <span class="badge @GetStatusBadgeClass(Model.Status)">
+                                        @Html.DisplayFor(model => model.Status)
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="m-0 font-weight-bold text-primary">Thông tin tài chính</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3 row">
+                                < class="col-sm-4 col-form-label">@Html.DisplayNameFor(model =>
+                                    model.SubTotal):</ label >
+                                <div class="col-sm-8 col-form-label">
+                                    @Model.SubTotal.ToString("N0") đ
+                                </div>
+                            </div>
+                            <div class="mb-3 row">
+                                < class="col-sm-4 col-form-label">@Html.DisplayNameFor(model =>
+                                    model.GrandTotal):</ label >
+                                <div class="col-sm-8 col-form-label">
+                                    <span class="fw-bold">@Model.GrandTotal.ToString("N0") đ</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chi tiết đơn hàng -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Thông tin sản phẩm</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                                <tr class="table-primary">
+                                    <th>STT</th>
+                                    <th>Sản phẩm</th>
+                                    <th>Đơn vị</th>
+                                    <th>Số lượng</th>
+                                    <th>Đơn giá</th>
+                                    <th>Thành tiền</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    int index = 1;
+                                    @foreach (var item in Model.SalesOrderDetails)
+                                    {
+                                        <tr>
+                                            <td>@index</td>
+                                            <td>@item.Product.Name</td>
+                                            <td>@item.Product.Unit</td>
+                                            <td>@item.Quantity</td>
+                                            <td>@item.UnitPrice.ToString("N0") đ</td>
+                                            <td>@item.Total.ToString("N0") đ</td>
+                                        </tr>
+                                        index++;
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <form asp-action="Delete" method="post">
+                <input type="hidden" asp-for="Id" />
+                <div class="d-flex justify-content-between mt-3">
+                    <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+                    <button type="submit" class="btn btn-danger">Xác nhận xóa</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
+@functions {
+    public string GetStatusBadgeClass(DehaAccountingMvc.Models.Accounting.SalesOrderStatus status)
+    {
+        switch (status)
+        {
+            case DehaAccountingMvc.Models.Accounting.SalesOrderStatus.Draft:
+                return "bg-secondary";
+            case DehaAccountingMvc.Models.Accounting.SalesOrderStatus.New:
+                return "bg-primary";
+            case DehaAccountingMvc.Models.Accounting.SalesOrderStatus.Confirmed:
+                return "bg-info";
+            case DehaAccountingMvc.Models.Accounting.SalesOrderStatus.PartiallyShipped:
+            case DehaAccountingMvc.Models.Accounting.SalesOrderStatus.FullyShipped:
+                return "bg-warning";
+            case DehaAccountingMvc.Models.Accounting.SalesOrderStatus.Invoiced:
+            case DehaAccountingMvc.Models.Accounting.SalesOrderStatus.PartiallyPaid:
+                return "bg-info";
+            case DehaAccountingMvc.Models.Accounting.SalesOrderStatus.FullyPaid:
+                return "bg-success";
+            case DehaAccountingMvc.Models.Accounting.SalesOrderStatus.Cancelled:
+            case DehaAccountingMvc.Models.Accounting.SalesOrderStatus.Returned:
+                return "bg-danger";
+            default:
+                return "bg-secondary";
+        }
+    }
+}

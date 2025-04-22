@@ -1,0 +1,242 @@
+@using DehaAccountingMvc.Models.Accounting
+@{
+    var productCount = ViewBag.ProductCount;
+    var customerCount = ViewBag.CustomerCount;
+    var supplierCount = ViewBag.SupplierCount;
+    var topStockProducts = (IEnumerable<Product>)ViewBag.TopStockProducts;
+}
+
+<div class="row mb-4">
+    <!-- Biểu đồ tròn phân bố dữ liệu hệ thống -->
+    <div class="col-xl-6 col-md-12 mb-3 mb-xl-0">
+        <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden">
+            <div class="card-header bg-white py-3 border-0">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-pie-chart text-primary me-2" style="font-size: 1.2rem;"></i>
+                    <h5 class="card-title mb-0">Phân bố dữ liệu hệ thống</h5>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="text-center">
+                    <canvas id="pieChart" width="240" height="240" style="margin: 0 auto;"></canvas>
+                </div>
+            </div>
+            <div class="card-footer bg-white border-0 py-3">
+                <div class="row g-2 text-center">
+                    <div class="col-4">
+                        <div class="rounded-3 py-2 bg-light">
+                            <h5 class="fw-bold text-primary mb-1">@productCount</h5>
+                            <small class="text-muted d-block">Sản phẩm</small>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="rounded-3 py-2 bg-light">
+                            <h5 class="fw-bold text-success mb-1">@customerCount</h5>
+                            <small class="text-muted d-block">Khách hàng</small>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="rounded-3 py-2 bg-light">
+                            <h5 class="fw-bold text-warning mb-1">@supplierCount</h5>
+                            <small class="text-muted d-block">Nhà cung cấp</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Biểu đồ cột top sản phẩm tồn kho -->
+    <div class="col-xl-6 col-md-12">
+        <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden">
+            <div class="card-header bg-white py-3 border-0">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-bar-chart text-primary me-2" style="font-size: 1.2rem;"></i>
+                    <h5 class="card-title mb-0">Top sản phẩm tồn kho cao nhất</h5>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="text-center">
+                    <canvas id="barChart" width="400" height="240" style="margin: 0 auto;"></canvas>
+                </div>
+            </div>
+            @if (topStockProducts != null && topStockProducts.Any())
+            {
+                <div class="card-footer bg-white border-0 pb-3">
+                    <div class="list-group list-group-flush">
+                        @foreach (var product in topStockProducts.Take(3))
+                        {
+                            <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-2 border-0">
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle bg-primary bg-opacity-10 p-2 me-2">
+                                        <i class="bi bi-box text-primary"></i>
+                                    </div>
+                                    <div class="text-truncate" style="max-width: 200px;">@product.Name</div>
+                                </div>
+                                <span class="badge bg-primary rounded-pill">@product.StockQuantity</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Thêm CDN cho Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Cấu hình chung cho biểu đồ
+        Chart.defaults.font.family = "'Poppins', sans-serif";
+        Chart.defaults.font.size = 12;
+        Chart.defaults.animation = false;
+
+        // Biểu đồ tròn phân bố dữ liệu hệ thống
+        renderPieChart();
+
+        // Biểu đồ cột tồn kho sản phẩm
+        renderBarChart();
+
+        // Hàm vẽ biểu đồ tròn
+        function renderPieChart() {
+            var pieCtx = document.getElementById('pieChart');
+            if (!pieCtx) return;
+
+            var pieData = {
+                datasets: [{
+                    data: [@productCount, @customerCount, @supplierCount],
+                    backgroundColor: [
+                        'rgba(13, 110, 253, 0.85)',
+                        'rgba(25, 135, 84, 0.85)',
+                        'rgba(255, 193, 7, 0.85)'
+                    ],
+                    borderColor: '#ffffff',
+                    borderWidth: 2,
+                    hoverOffset: 4
+                }],
+                labels: [
+                    'Sản phẩm',
+                    'Khách hàng',
+                    'Nhà cung cấp'
+                ]
+            };
+
+            var pieOptions = {
+                responsive: false,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            boxWidth: 12,
+                            padding: 15,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    },
+                    tooltip: {
+                        enabled: true,
+                        callbacks: {
+                            label: function (context) {
+                                var label = context.label || '';
+                                var value = context.raw || 0;
+                                return label + ': ' + value + ' bản ghi';
+                            }
+                        }
+                    }
+                },
+                cutout: '60%'
+            };
+
+            new Chart(pieCtx, {
+                type: 'doughnut',
+                data: pieData,
+                options: pieOptions
+            });
+        }
+
+        // Hàm vẽ biểu đồ cột
+        function renderBarChart() {
+            @if (topStockProducts != null && topStockProducts.Any())
+                {
+                    <text>
+                        var barCtx = document.getElementById('barChart');
+                        if (!barCtx) return;
+
+                        var barLabels = [@Html.Raw(string.Join(",", topStockProducts.Select(p => $"'{p.Name}'")))];
+                        var barData = [@string.Join(",", topStockProducts.Select(p => p.StockQuantity))];
+
+                        // Tìm giá trị tối đa và làm tròn lên
+                        var maxValue = Math.max(...barData, 0);
+
+                        // Làm tròn lên thành bội số của 5 hoặc 10
+                        var roundedMax = Math.ceil(maxValue / 10) * 10;
+                        if (roundedMax < 50) roundedMax = Math.ceil(maxValue / 5) * 5;
+
+                        var barOptions = {
+                            responsive: false,
+                        maintainAspectRatio: false,
+                        indexAxis: 'y',
+                        plugins: {
+                            legend: {
+                            display: false
+                                },
+                        tooltip: {
+                            callbacks: {
+                            label: function(context) {
+                                            return 'Số lượng: ' + context.raw;
+                                        }
+                                    }
+                                }
+                            },
+                        scales: {
+                            x: {
+                            beginAtZero: true,
+                        max: roundedMax,
+                        ticks: {
+                            stepSize: Math.max(1, Math.ceil(roundedMax / 5)),
+                        precision: 0
+                                    },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                                    }
+                                },
+                        y: {
+                            ticks: {
+                            callback: function(value) {
+                                            var label = this.getLabelForValue(value);
+                                            if (label && label.length > 15) {
+                                                return label.substr(0, 15) + '...';
+                                            }
+                        return label;
+                                        }
+                                    },
+                        grid: {
+                            display: false
+                                    }
+                                }
+                            }
+                        };
+
+                        new Chart(barCtx, {
+                            type: 'bar',
+                        data: {
+                            labels: barLabels,
+                        datasets: [{
+                            data: barData,
+                        backgroundColor: 'rgba(13, 110, 253, 0.7)',
+                        borderColor: 'rgba(13, 110, 253, 1)',
+                        borderWidth: 1,
+                        borderRadius: 4,
+                        barThickness: 15,
+                        minBarLength: 5
+                                }]
+                            },
+                        options: barOptions
+                        });
+                    </text>
+            }
+        }
+    });
+</script>

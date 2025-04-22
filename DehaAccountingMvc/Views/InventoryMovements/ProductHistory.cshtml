@@ -1,0 +1,114 @@
+@model IEnumerable<DehaAccountingMvc.Models.Accounting.InventoryMovement>
+
+@{
+    ViewData["Title"] = "Lịch sử kho";
+    var product = ViewBag.Product as DehaAccountingMvc.Models.Accounting.Product;
+}
+
+<div class="card shadow-sm">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <h4 class="m-0 font-weight-bold text-primary">Lịch sử kho: @product?.Name</h4>
+        <div>
+            <a asp-action="StockReport" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i> Quay lại báo cáo
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="m-0 font-weight-bold text-primary">Thông tin sản phẩm</h5>
+                    </div>
+                    <div class="card-body">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-4">Mã sản phẩm:</dt>
+                            <dd class="col-sm-8">@product?.ProductCode</dd>
+
+                            <dt class="col-sm-4">Tên sản phẩm:</dt>
+                            <dd class="col-sm-8">@product?.Name</dd>
+
+                            <dt class="col-sm-4">Danh mục:</dt>
+                            <dd class="col-sm-8">@product?.ProductCategory?.Name</dd>
+
+                            <dt class="col-sm-4">Đơn vị tính:</dt>
+                            <dd class="col-sm-8">@product?.Unit</dd>
+
+                            <dt class="col-sm-4">Tồn kho hiện tại:</dt>
+                            <dd class="col-sm-8">
+                                <span class="@(product?.StockQuantity < product?.MinimumStockLevel ? "text-danger fw-bold" : "")">
+                                    @product?.StockQuantity
+                                </span>
+                            </dd>
+
+                            <dt class="col-sm-4">Tồn kho tối thiểu:</dt>
+                            <dd class="col-sm-8">@product?.MinimumStockLevel</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>@Html.DisplayNameFor(model => model.MovementCode)</th>
+                        <th>@Html.DisplayNameFor(model => model.MovementDate)</th>
+                        <th>@Html.DisplayNameFor(model => model.MovementType)</th>
+                        <th class="text-end">@Html.DisplayNameFor(model => model.BeforeQuantity)</th>
+                        <th class="text-end">@Html.DisplayNameFor(model => model.Quantity)</th>
+                        <th class="text-end">@Html.DisplayNameFor(model => model.AfterQuantity)</th>
+                        <th>@Html.DisplayNameFor(model => model.Notes)</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                            <tr>
+                                <td>@Html.DisplayFor(modelItem => item.MovementCode)</td>
+                                <td>@item.MovementDate.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>@Html.DisplayFor(modelItem => item.MovementType)</td>
+                                <td class="text-end">@Html.DisplayFor(modelItem => item.BeforeQuantity)</td>
+                                <td class="text-end">
+                                    @{
+                                            string quantityClass = "";
+                                            string prefix = "";
+                                    
+                                            if (item.MovementType == DehaAccountingMvc.Models.Accounting.MovementType.PurchaseReceive ||
+                                                    item.MovementType == DehaAccountingMvc.Models.Accounting.MovementType.AdjustmentIn ||
+                                                    item.MovementType == DehaAccountingMvc.Models.Accounting.MovementType.CustomerReturn)
+                                            {
+                                                    quantityClass = "text-success";
+                                                    prefix = "+";
+                                            }
+                                            else if (item.MovementType == DehaAccountingMvc.Models.Accounting.MovementType.SalesShipment ||
+                                                            item.MovementType == DehaAccountingMvc.Models.Accounting.MovementType.AdjustmentOut ||
+                                                            item.MovementType == DehaAccountingMvc.Models.Accounting.MovementType.ReturnToVendor)
+                                            {
+                                                    quantityClass = "text-danger";
+                                                    prefix = "-";
+                                            }
+                                    }
+                                <span class="@quantityClass">
+                                    @(item.MovementType == DehaAccountingMvc.Models.Accounting.MovementType.Stocktaking ?
+                                                                            $"{item.AfterQuantity - item.BeforeQuantity:+#;-#;0}" :
+                                                                            $"{prefix}{item.Quantity}")
+                                </span>
+                            </td>
+                            <td class="text-end">@Html.DisplayFor(modelItem => item.AfterQuantity)</td>
+                            <td>@Html.DisplayFor(modelItem => item.Notes)</td>
+                            <td class="text-end">
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info">
+                                    <i class="bi bi-info-circle"></i>
+                                </a>
+                            </td>
+                        </tr>
+                                        }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div> 

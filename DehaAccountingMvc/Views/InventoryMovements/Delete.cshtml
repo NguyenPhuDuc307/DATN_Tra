@@ -1,0 +1,78 @@
+@model DehaAccountingMvc.Models.Accounting.InventoryMovement
+
+@{
+    ViewData["Title"] = "Xóa phiếu nhập xuất kho";
+}
+
+<h1>Xóa phiếu nhập xuất kho</h1>
+
+<div class="alert alert-danger">
+    <h4><i class="bi bi-exclamation-triangle"></i> Xác nhận xóa?</h4>
+    <p>Bạn có chắc chắn muốn xóa phiếu nhập xuất kho này không?</p>
+    <p>Lưu ý: Xóa phiếu sẽ hoàn tác thay đổi tồn kho đã thực hiện.</p>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Thông tin phiếu #@Model.MovementCode</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-2">
+                            <strong>@Html.DisplayNameFor(model => model.MovementCode):</strong>
+                            <span>@Html.DisplayFor(model => model.MovementCode)</span>
+                        </div>
+                        <div class="mb-2">
+                            <strong>@Html.DisplayNameFor(model => model.MovementDate):</strong>
+                            <span>@Model.MovementDate.ToString("dd/MM/yyyy")</span>
+                        </div>
+                        <div class="mb-2">
+                            <strong>@Html.DisplayNameFor(model => model.MovementType):</strong>
+                            <span>@Html.DisplayFor(model => model.MovementType)</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-2">
+                            <strong>@Html.DisplayNameFor(model => model.Product):</strong>
+                            <span>@(Model.Product?.ProductCode + " - " + Model.Product?.Name)</span>
+                        </div>
+                        <div class="mb-2">
+                            <strong>@Html.DisplayNameFor(model => model.Quantity):</strong>
+                            <span>@Html.DisplayFor(model => model.Quantity) @(Model.Product?.Unit)</span>
+                        </div>
+                        <div class="mb-2">
+                            <strong>@Html.DisplayNameFor(model => model.WarehouseLocation):</strong>
+                            <span>@Html.DisplayFor(model => model.WarehouseLocation)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-info mt-3">
+                    <div class="mb-2">
+                        <strong>Tồn kho trước:</strong>
+                        <span>@Html.DisplayFor(model => model.BeforeQuantity) @(Model.Product?.Unit)</span>
+                    </div>
+                    <div class="mb-2">
+                        <strong>Tồn kho sau:</strong>
+                        <span>@Html.DisplayFor(model => model.AfterQuantity) @(Model.Product?.Unit)</span>
+                    </div>
+                    <div class="mb-2">
+                        <strong>Thay đổi:</strong>
+                        <span class="@(Model.AfterQuantity > Model.BeforeQuantity ? "text-success" : "text-danger")">
+                            @(Model.AfterQuantity > Model.BeforeQuantity ? "+" : "")@(Model.AfterQuantity - Model.BeforeQuantity) @(Model.Product?.Unit)
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <form asp-action="Delete">
+            <input type="hidden" asp-for="Id" />
+            <button type="submit" class="btn btn-danger me-2">Xác nhận xóa</button>
+            <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
+        </form>
+    </div>
+</div> 
