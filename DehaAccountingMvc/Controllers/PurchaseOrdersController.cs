@@ -157,58 +157,106 @@ namespace DehaAccountingMvc.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("OrderNumber,OrderDate,ExpectedDeliveryDate,SupplierId,Status,ReferenceNumber,PaymentMethod,PaymentTerms,DeliveryAddress,Notes")] PurchaseOrder purchaseOrder, int[] productId, int[] quantity, decimal[] unitPrice, decimal[] discountPercentage)
         {
-            if (ModelState.IsValid)
+            // Kiểm tra đầu vào và ghi log các lỗi để debug
+            Console.WriteLine("=============== PURCHASE ORDER CREATE ===============");
+            Console.WriteLine($"SupplierId: {purchaseOrder.SupplierId}");
+            Console.WriteLine($"Products count: {productId?.Length ?? 0}");
+            
+            // Xóa lỗi productId nếu có trong ModelState
+            if (ModelState.ContainsKey("productId"))
             {
-                // Thiết lập thông tin cơ bản cho đơn hàng
-                purchaseOrder.CreatedDate = DateTime.Now;
-                purchaseOrder.CreatedBy = User.Identity?.Name ?? "System";
-
-                // Tạo danh sách chi tiết đơn hàng
-                purchaseOrder.PurchaseOrderDetails = new List<PurchaseOrderDetail>();
-                decimal subTotal = 0;
-
-                if (productId != null && productId.Length > 0)
+                ModelState.Remove("productId");
+            }
+            
+            if (productId == null || productId.Length == 0)
+            {
+                ModelState.AddModelError("", "Chưa có sản phẩm nào trong đơn hàng");
+                Console.WriteLine("Lỗi: Chưa có sản phẩm nào trong đơn hàng");
+            }
+            
+            if (purchaseOrder.SupplierId <= 0)
+            {
+                ModelState.AddModelError("SupplierId", "Vui lòng chọn nhà cung cấp");
+                Console.WriteLine("Lỗi: Chưa chọn nhà cung cấp");
+            }
+            
+            // Debug - ghi log ModelState
+            foreach (var state in ModelState)
+            {
+                if (state.Value.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid)
                 {
-                    for (int i = 0; i < productId.Length; i++)
+                    foreach (var error in state.Value.Errors)
                     {
-                        if (productId[i] > 0 && quantity[i] > 0)
-                        {
-                            decimal itemSubTotal = quantity[i] * unitPrice[i];
-                            decimal itemDiscount = itemSubTotal * (discountPercentage[i] / 100);
-                            decimal itemTotal = itemSubTotal - itemDiscount;
-
-                            var product = await _context.Products.FindAsync(productId[i]);
-                            string warehouseLocation = product?.WarehouseLocation ?? "";
-
-                            var detail = new PurchaseOrderDetail
-                            {
-                                ProductId = productId[i],
-                                Quantity = quantity[i],
-                                UnitPrice = unitPrice[i],
-                                DiscountPercentage = discountPercentage[i],
-                                DiscountAmount = itemDiscount,
-                                SubTotal = itemSubTotal,
-                                Total = itemTotal,
-                                WarehouseLocation = warehouseLocation,
-                                CreatedDate = DateTime.Now,
-                                CreatedBy = User.Identity?.Name ?? "System"
-                            };
-
-                            purchaseOrder.PurchaseOrderDetails.Add(detail);
-                            subTotal += itemTotal;
-                        }
+                        Console.WriteLine($"ModelState Error - {state.Key}: {error.ErrorMessage}");
                     }
                 }
+            }
+            
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    // Thiết lập thông tin cơ bản cho đơn hàng
+                    purchaseOrder.CreatedDate = DateTime.Now;
+                    purchaseOrder.CreatedBy = User.Identity?.Name ?? "System";
 
-                // Cập nhật tổng tiền
-                purchaseOrder.SubTotal = subTotal;
-                purchaseOrder.GrandTotal = subTotal;
+                    // Tạo danh sách chi tiết đơn hàng
+                    purchaseOrder.PurchaseOrderDetails = new List<PurchaseOrderDetail>();
+                    decimal subTotal = 0;
 
-                _context.Add(purchaseOrder);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                    if (productId != null && productId.Length > 0)
+                    {
+                        for (int i = 0; i < productId.Length; i++)
+                        {
+                            if (productId[i] > 0 && quantity[i] > 0)
+                            {
+                                decimal itemSubTotal = quantity[i] * unitPrice[i];
+                                decimal itemDiscount = itemSubTotal * (discountPercentage[i] / 100);
+                                decimal itemTotal = itemSubTotal - itemDiscount;
+
+                                var product = await _context.Products.FindAsync(productId[i]);
+                                string warehouseLocation = product?.WarehouseLocation ?? "";
+
+                                var detail = new PurchaseOrderDetail
+                                {
+                                    ProductId = productId[i],
+                                    Quantity = quantity[i],
+                                    UnitPrice = unitPrice[i],
+                                    DiscountPercentage = discountPercentage[i],
+                                    DiscountAmount = itemDiscount,
+                                    SubTotal = itemSubTotal,
+                                    Total = itemTotal,
+                                    WarehouseLocation = warehouseLocation,
+                                    Notes = "", // Thêm giá trị mặc định cho trường Notes
+                                    CreatedDate = DateTime.Now,
+                                    CreatedBy = User.Identity?.Name ?? "System"
+                                };
+
+                                purchaseOrder.PurchaseOrderDetails.Add(detail);
+                                subTotal += itemTotal;
+                            }
+                        }
+                    }
+
+                    // Cập nhật tổng tiền
+                    purchaseOrder.SubTotal = subTotal;
+                    purchaseOrder.GrandTotal = subTotal;
+
+                    _context.Add(purchaseOrder);
+                    await _context.SaveChangesAsync();
+                    
+                    TempData["SuccessMessage"] = "Đã tạo đơn mua hàng thành công";
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", $"Lỗi: {ex.Message}");
+                    Console.WriteLine($"Exception: {ex.Message}");
+                    Console.WriteLine($"StackTrace: {ex.StackTrace}");
+                }
             }
 
+            Console.WriteLine("ModelState không hợp lệ hoặc có lỗi khi xử lý, quay lại form");
             await PrepareDropdownLists();
             return View(purchaseOrder);
         }

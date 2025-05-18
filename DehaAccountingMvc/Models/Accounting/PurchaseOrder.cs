@@ -140,7 +140,8 @@ namespace DehaAccountingMvc.Models.Accounting
 
         // Navigation properties
         [ForeignKey("SupplierId")]
-        public virtual Supplier Supplier { get; set; } = null!;
+        [Display(Name = "Nhà cung cấp")]
+        public virtual Supplier? Supplier { get; set; }
 
         public virtual ICollection<PurchaseOrderDetail> PurchaseOrderDetails { get; set; }
     }

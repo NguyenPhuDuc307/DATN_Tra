@@ -89,57 +89,105 @@ namespace DehaAccountingMvc.Controllers
         // POST: SalesOrders/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("OrderNumber,OrderDate,ExpectedShippingDate,CustomerId,Status,CustomerReferenceNumber,PaymentMethod,PaymentTerms,ShippingAddress,Notes")] SalesOrder salesOrder, int[] productId, int[] quantity, decimal[] unitPrice, decimal[] discountPercentage)
+        public async Task<IActionResult> Create([Bind("OrderNumber,OrderDate,ExpectedShippingDate,CustomerId,Status,CustomerReferenceNumber,PaymentMethod,PaymentTerms,ShippingAddress,Notes,SalesPerson")] SalesOrder salesOrder, int[] productId, int[] quantity, decimal[] unitPrice, decimal[] discountPercentage)
         {
-            if (ModelState.IsValid)
+            // Kiểm tra đầu vào và ghi log các lỗi để debug
+            Console.WriteLine("=============== SALES ORDER CREATE ===============");
+            Console.WriteLine($"CustomerId: {salesOrder.CustomerId}");
+            Console.WriteLine($"Products count: {productId?.Length ?? 0}");
+            
+            // Xóa lỗi productId nếu có trong ModelState
+            if (ModelState.ContainsKey("productId"))
             {
-                // Thiết lập thông tin cơ bản cho đơn hàng
-                salesOrder.CreatedDate = DateTime.Now;
-                salesOrder.CreatedBy = User.Identity?.Name ?? "System";
-                salesOrder.Status = SalesOrderStatus.New;
-
-                // Tạo danh sách chi tiết đơn hàng
-                salesOrder.SalesOrderDetails = new List<SalesOrderDetail>();
-                decimal subTotal = 0;
-
-                if (productId != null && productId.Length > 0)
+                ModelState.Remove("productId");
+            }
+            
+            if (productId == null || productId.Length == 0)
+            {
+                ModelState.AddModelError("", "Chưa có sản phẩm nào trong đơn hàng");
+                Console.WriteLine("Lỗi: Chưa có sản phẩm nào trong đơn hàng");
+            }
+            
+            if (salesOrder.CustomerId <= 0)
+            {
+                ModelState.AddModelError("CustomerId", "Vui lòng chọn khách hàng");
+                Console.WriteLine("Lỗi: Chưa chọn khách hàng");
+            }
+            
+            // Debug - ghi log ModelState
+            foreach (var state in ModelState)
+            {
+                if (state.Value.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid)
                 {
-                    for (int i = 0; i < productId.Length; i++)
+                    foreach (var error in state.Value.Errors)
                     {
-                        if (productId[i] > 0 && quantity[i] > 0)
-                        {
-                            decimal itemSubTotal = quantity[i] * unitPrice[i];
-                            decimal itemDiscount = itemSubTotal * (discountPercentage[i] / 100);
-                            decimal itemTotal = itemSubTotal - itemDiscount;
-
-                            var detail = new SalesOrderDetail
-                            {
-                                ProductId = productId[i],
-                                Quantity = quantity[i],
-                                UnitPrice = unitPrice[i],
-                                DiscountPercentage = discountPercentage[i],
-                                DiscountAmount = itemDiscount,
-                                SubTotal = itemSubTotal,
-                                Total = itemTotal,
-                                CreatedDate = DateTime.Now,
-                                CreatedBy = User.Identity?.Name ?? "System"
-                            };
-
-                            salesOrder.SalesOrderDetails.Add(detail);
-                            subTotal += itemTotal;
-                        }
+                        Console.WriteLine($"ModelState Error - {state.Key}: {error.ErrorMessage}");
                     }
                 }
+            }
+            
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    // Thiết lập thông tin cơ bản cho đơn hàng
+                    salesOrder.CreatedDate = DateTime.Now;
+                    salesOrder.CreatedBy = User.Identity?.Name ?? "System";
+                    salesOrder.Status = SalesOrderStatus.New;
 
-                // Cập nhật tổng tiền
-                salesOrder.SubTotal = subTotal;
-                salesOrder.GrandTotal = subTotal;
+                    // Tạo danh sách chi tiết đơn hàng
+                    salesOrder.SalesOrderDetails = new List<SalesOrderDetail>();
+                    decimal subTotal = 0;
 
-                _context.Add(salesOrder);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                    if (productId != null && productId.Length > 0)
+                    {
+                        for (int i = 0; i < productId.Length; i++)
+                        {
+                            if (productId[i] > 0 && quantity[i] > 0)
+                            {
+                                decimal itemSubTotal = quantity[i] * unitPrice[i];
+                                decimal itemDiscount = itemSubTotal * (discountPercentage[i] / 100);
+                                decimal itemTotal = itemSubTotal - itemDiscount;
+
+                                var detail = new SalesOrderDetail
+                                {
+                                    ProductId = productId[i],
+                                    Quantity = quantity[i],
+                                    UnitPrice = unitPrice[i],
+                                    DiscountPercentage = discountPercentage[i],
+                                    DiscountAmount = itemDiscount,
+                                    SubTotal = itemSubTotal,
+                                    Total = itemTotal,
+                                    Notes = "", // Thêm giá trị mặc định cho trường Notes
+                                    CreatedDate = DateTime.Now,
+                                    CreatedBy = User.Identity?.Name ?? "System"
+                                };
+
+                                salesOrder.SalesOrderDetails.Add(detail);
+                                subTotal += itemTotal;
+                            }
+                        }
+                    }
+
+                    // Cập nhật tổng tiền
+                    salesOrder.SubTotal = subTotal;
+                    salesOrder.GrandTotal = subTotal;
+
+                    _context.Add(salesOrder);
+                    await _context.SaveChangesAsync();
+                    
+                    TempData["SuccessMessage"] = "Đã tạo đơn hàng thành công";
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", $"Lỗi: {ex.Message}");
+                    Console.WriteLine($"Exception: {ex.Message}");
+                    Console.WriteLine($"StackTrace: {ex.StackTrace}");
+                }
             }
 
+            Console.WriteLine("ModelState không hợp lệ hoặc có lỗi khi xử lý, quay lại form");
             await PrepareDropdownLists();
             return View(salesOrder);
         }

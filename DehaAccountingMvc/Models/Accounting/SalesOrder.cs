@@ -162,7 +162,8 @@ namespace DehaAccountingMvc.Models.Accounting
 
         // Navigation properties
         [ForeignKey("CustomerId")]
-        public virtual Customer Customer { get; set; } = null!;
+        [Display(Name = "Khách hàng")]
+        public virtual Customer? Customer { get; set; }
 
         public virtual ICollection<SalesOrderDetail> SalesOrderDetails { get; set; }
     }
