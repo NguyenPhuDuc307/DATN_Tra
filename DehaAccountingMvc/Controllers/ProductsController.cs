@@ -63,15 +63,110 @@ namespace DehaAccountingMvc.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ProductCode,Name,Description,ProductCategoryId,SupplierId,DefaultSupplierId,PurchasePrice,SellingPrice,DiscountPrice,Unit,StockQuantity,MinimumStockLevel,ReorderLevel,LeadTime,Brand,Origin,WarehouseLocation,Barcode,IsSellable,IsActive,IsService,TrackInventory,Notes")] Product product)
         {
+            // Debug - ghi log tất cả các giá trị
+            Console.WriteLine("=============== FORM VALUES ===============");
+            foreach (var key in Request.Form.Keys)
+            {
+                Console.WriteLine($"{key}: {Request.Form[key]}");
+            }
+            Console.WriteLine($"ProductCategoryId trong model: {product.ProductCategoryId}");
+            
+            // Debug - kiểm tra ModelState
+            Console.WriteLine("=============== MODEL STATE ===============");
+            foreach (var state in ModelState)
+            {
+                Console.WriteLine($"Key: {state.Key}, Valid: {state.Value.ValidationState}");
+                if (state.Value.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid)
+                {
+                    foreach (var error in state.Value.Errors)
+                    {
+                        Console.WriteLine($"  - Error: {error.ErrorMessage}");
+                    }
+                }
+            }
+            
+            // Xử lý trường hợp ProductCategoryId có format không đúng (ví dụ: "1,1")
+            string productCategoryIdStr = Request.Form["ProductCategoryId"].ToString();
+            Console.WriteLine($"Raw ProductCategoryId from form: '{productCategoryIdStr}'");
+            
+            if (!string.IsNullOrEmpty(productCategoryIdStr))
+            {
+                if (productCategoryIdStr.Contains(","))
+                {
+                    // Lấy giá trị đầu tiên trước dấu phẩy
+                    productCategoryIdStr = productCategoryIdStr.Split(',')[0];
+                    Console.WriteLine($"Fixed ProductCategoryId after split: '{productCategoryIdStr}'");
+                }
+                
+                if (int.TryParse(productCategoryIdStr, out int categoryId) && categoryId > 0)
+                {
+                    product.ProductCategoryId = categoryId;
+                    Console.WriteLine($"Updated model ProductCategoryId: {product.ProductCategoryId}");
+                }
+            }
+            
+            // Xóa tất cả lỗi liên quan đến ProductCategory và ProductCategoryId
+            ModelState.Remove("ProductCategory");
+            ModelState.Remove("ProductCategoryId");
+            
+            // Thêm lại lỗi cho ProductCategoryId nếu cần thiết
+            if (product.ProductCategoryId <= 0)
+            {
+                ModelState.AddModelError("ProductCategoryId", "Vui lòng chọn danh mục sản phẩm.");
+            }
+            
+            // Kiểm tra danh mục có tồn tại không khi ProductCategoryId > 0
+            if (product.ProductCategoryId > 0)
+            {
+                var categoryExists = await _context.ProductCategories.AnyAsync(c => c.Id == product.ProductCategoryId);
+                if (!categoryExists)
+                {
+                    ModelState.AddModelError("ProductCategoryId", "Danh mục sản phẩm không tồn tại.");
+                    Console.WriteLine($"Danh mục với ID={product.ProductCategoryId} không tồn tại");
+                }
+                else
+                {
+                    Console.WriteLine($"Đã xác thực danh mục ID={product.ProductCategoryId} tồn tại");
+                }
+            }
+            
+            // Xử lý ModelState
             if (ModelState.IsValid)
             {
+                // Gán giá trị mặc định cho một số trường
                 product.CreatedDate = DateTime.Now;
-                product.CreatedBy = User.Identity.Name;
-                _context.Add(product);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                product.CreatedBy = User.Identity.Name ?? "System";
+                
+                // Debug - thông báo trạng thái tạo sản phẩm
+                Console.WriteLine($"Creating product: {product.Name} with CategoryId: {product.ProductCategoryId}");
+                
+                try 
+                {
+                    // Không cần tải ProductCategory trước khi tạo
+                    // Entity Framework sẽ xử lý mối quan hệ dựa trên khóa ngoại
+                    _context.Add(product);
+                    await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "Sản phẩm đã được tạo thành công.";
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError(string.Empty, $"Có lỗi xảy ra: {ex.Message}");
+                    Console.WriteLine($"Exception: {ex.Message}");
+                }
+            }
+            
+            // In các lỗi để debug
+            Console.WriteLine("========== MODEL STATE ERRORS ==========");
+            foreach (var state in ModelState)
+            {
+                foreach (var error in state.Value.Errors)
+                {
+                    Console.WriteLine($"Field: {state.Key}, Error: {error.ErrorMessage}");
+                }
             }
 
+            // Khởi tạo lại các dropdown list
             await PrepareDropdownLists(product);
             return View(product);
         }
@@ -189,15 +284,39 @@ namespace DehaAccountingMvc.Controllers
 
         private async Task PrepareDropdownLists(Product product = null)
         {
-            // Danh sách danh mục sản phẩm
+            // Lấy danh sách danh mục sản phẩm từ database
+            var categories = await _context.ProductCategories
+                .Where(c => c.IsActive) // Chỉ lấy danh mục đang hoạt động
+                .OrderBy(c => c.DisplayOrder)
+                .ThenBy(c => c.Name)
+                .ToListAsync();
+                
+            // Debug: Kiểm tra danh sách danh mục
+            Console.WriteLine($"Loaded {categories.Count} product categories");
+            foreach (var cat in categories.Take(5)) // In ra 5 danh mục đầu tiên để debug
+            {
+                Console.WriteLine($"Category: Id={cat.Id}, Name={cat.Name}");
+            }
+            
+            // Tạo SelectList với selectedValue là product?.ProductCategoryId
+            // Sử dụng trực tiếp Id thay vì chuyển sang string để tránh vấn đề dấu phẩy
             ViewBag.ProductCategories = new SelectList(
-                await _context.ProductCategories.OrderBy(c => c.Name).ToListAsync(),
-                "Id", "Name", product?.ProductCategoryId);
+                categories,
+                "Id", 
+                "Name", 
+                product?.ProductCategoryId);
 
             // Danh sách nhà cung cấp
+            var suppliers = await _context.Suppliers
+                .Where(s => s.IsActive)
+                .OrderBy(s => s.Name)
+                .ToListAsync();
+                
             ViewBag.Suppliers = new SelectList(
-                await _context.Suppliers.OrderBy(s => s.Name).ToListAsync(),
-                "Id", "Name", product?.SupplierId);
+                suppliers,
+                "Id", 
+                "Name", 
+                product?.SupplierId);
 
             // Danh sách loại đơn vị
             ViewBag.UnitTypes = Enum.GetValues(typeof(UnitType))

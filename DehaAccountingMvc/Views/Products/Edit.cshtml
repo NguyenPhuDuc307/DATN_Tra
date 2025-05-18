@@ -12,10 +12,9 @@
         </div>
 
         <form asp-action="Edit" method="post">
+            <div asp-validation-summary="All" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
             <input type="hidden" asp-for="CreatedDate" />
-
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <div class="row">
                 <div class="col-md-6">
@@ -134,34 +133,34 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script>
-        $(document).ready(function () {
-            // Xử lý hiển thị/ẩn trường số lượng tồn kho dựa vào loại sản phẩm
-            function toggleStockFields() {
-                if ($("#isService").is(":checked")) {
-                    $("#stockFields").hide();
-                } else {
-                    $("#stockFields").show();
-                }
-            }
+                <script>
+                    $(document).ready(function () {
+                        // Xử lý hiển thị/ẩn trường số lượng tồn kho dựa vào loại sản phẩm
+                        function toggleStockFields() {
+                            if ($("#isService").is(":checked")) {
+                                $("#stockFields").hide();
+                            } else {
+                                $("#stockFields").show();
+                            }
+                        }
 
-            // Gọi hàm khi trang tải xong
-            toggleStockFields();
+                        // Gọi hàm khi trang tải xong
+                        toggleStockFields();
 
-            // Gọi hàm khi người dùng thay đổi checkbox
-            $("#isService").change(function () {
-                toggleStockFields();
-            });
+                        // Gọi hàm khi người dùng thay đổi checkbox
+                        $("#isService").change(function () {
+                            toggleStockFields();
+                        });
 
-            // Xử lý khi chọn nhà cung cấp
-            $("#supplierId").change(function () {
-                var selectedValue = $(this).val();
+                        // Xử lý khi chọn nhà cung cấp
+                        $("#supplierId").change(function () {
+                            var selectedValue = $(this).val();
 
-                // Nếu chưa có nhà cung cấp mặc định được chọn, tự động chọn nhà cung cấp mặc định
-                if (!$("#defaultSupplierId").val()) {
-                    $("#defaultSupplierId").val(selectedValue);
-                }
-            });
-        });
-    </script>
+                            // Nếu chưa có nhà cung cấp mặc định được chọn, tự động chọn nhà cung cấp mặc định
+                            if (!$("#defaultSupplierId").val()) {
+                                $("#defaultSupplierId").val(selectedValue);
+                            }
+                        });
+                    });
+                </script>
 }

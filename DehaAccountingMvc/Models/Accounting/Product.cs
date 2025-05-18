@@ -77,6 +77,7 @@ namespace DehaAccountingMvc.Models.Accounting
         [Display(Name = "Mô tả")]
         public string Description { get; set; }
 
+        [Required(ErrorMessage = "Vui lòng chọn loại sản phẩm")]
         [Display(Name = "Loại sản phẩm")]
         public int ProductCategoryId { get; set; }
 

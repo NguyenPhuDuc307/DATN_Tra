@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace DehaAccountingMvc.Migrations
+namespace DehaAccountingMvc.Data.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration
@@ -96,7 +96,7 @@ namespace DehaAccountingMvc.Migrations
                     CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
                     CreatedBy = table.Column<string>(type: "TEXT", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: false)
+                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -304,6 +304,7 @@ namespace DehaAccountingMvc.Migrations
                     Description = table.Column<string>(type: "TEXT", maxLength: 500, nullable: false),
                     ProductCategoryId = table.Column<int>(type: "INTEGER", nullable: false),
                     SupplierId = table.Column<int>(type: "INTEGER", nullable: true),
+                    DefaultSupplierId = table.Column<int>(type: "INTEGER", nullable: true),
                     PurchasePrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     SellingPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     DiscountPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
@@ -452,7 +453,7 @@ namespace DehaAccountingMvc.Migrations
                     CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
                     CreatedBy = table.Column<string>(type: "TEXT", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: false)
+                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -493,7 +494,7 @@ namespace DehaAccountingMvc.Migrations
                     CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
                     CreatedBy = table.Column<string>(type: "TEXT", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: false)
+                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -573,6 +574,7 @@ namespace DehaAccountingMvc.Migrations
                     Notes = table.Column<string>(type: "TEXT", maxLength: 500, nullable: false),
                     IsVerified = table.Column<bool>(type: "INTEGER", nullable: false),
                     VerificationDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    VerifiedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
                     VerifiedBy = table.Column<string>(type: "TEXT", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
                     CreatedBy = table.Column<string>(type: "TEXT", nullable: false),
