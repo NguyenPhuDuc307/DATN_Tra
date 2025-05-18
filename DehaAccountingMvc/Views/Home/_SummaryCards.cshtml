@@ -1,10 +1,12 @@
 @using DehaAccountingMvc.Models.Accounting
 @{
     // Lấy dữ liệu từ ViewBag
-    var totalProducts = ViewBag.TotalProducts ?? 0;
-    var totalCustomers = ViewBag.TotalCustomers ?? 0;
-    var totalSuppliers = ViewBag.TotalSuppliers ?? 0;
-    var totalOrders = ViewBag.TotalOrders ?? 0;
+    var totalProducts = ViewBag.ProductCount ?? 0;
+    var totalCustomers = ViewBag.CustomerCount ?? 0;
+    var totalSuppliers = ViewBag.SupplierCount ?? 0;
+    
+    // Lấy số lượng đơn hàng
+    var salesOrderCount = ViewBag.SalesOrderCount ?? 0;
 
     // Các biến tùy chọn với giá trị mặc định
     var totalRevenue = ViewBag.TotalRevenue ?? 0M;
@@ -89,7 +91,7 @@
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
                         <div class="text-muted mb-1 small">Đơn hàng</div>
-                        <h3 class="display-6 fw-bold text-warning mb-0">@totalOrders</h3>
+                        <h3 class="display-6 fw-bold text-warning mb-0">@salesOrderCount</h3>
                     </div>
                     <div class="rounded-circle bg-warning bg-opacity-10 p-3">
                         <i class="bi bi-cart text-warning fs-4"></i>
@@ -121,8 +123,14 @@
                     </div>
                 </div>
                 <hr>
-                <div class="small text-muted">
-                    <i class="bi bi-arrow-up-right text-success me-1"></i>Tăng 15% so với tháng trước
+                <div class="small @(ViewBag.RevenueIncreased ? "text-success" : "text-danger")">
+                    @if(ViewBag.RevenueIncreased) {
+                        <i class="bi bi-arrow-up-right text-success me-1"></i>
+                        <span>Tăng @Math.Abs(ViewBag.RevenueChangePercent)% so với tháng trước</span>
+                    } else {
+                        <i class="bi bi-arrow-down-right text-danger me-1"></i>
+                        <span>Giảm @Math.Abs(ViewBag.RevenueChangePercent)% so với tháng trước</span>
+                    }
                 </div>
             </div>
         </div>
@@ -142,8 +150,14 @@
                     </div>
                 </div>
                 <hr>
-                <div class="small text-muted">
-                    <i class="bi bi-arrow-down-right text-danger me-1"></i>Giảm 5% so với tháng trước
+                <div class="small @(ViewBag.ExpensesDecreased ? "text-success" : "text-danger")">
+                    @if(ViewBag.ExpensesDecreased) {
+                        <i class="bi bi-arrow-down-right text-success me-1"></i>
+                        <span>Giảm @Math.Abs(ViewBag.ExpensesChangePercent)% so với tháng trước</span>
+                    } else {
+                        <i class="bi bi-arrow-up-right text-danger me-1"></i>
+                        <span>Tăng @Math.Abs(ViewBag.ExpensesChangePercent)% so với tháng trước</span>
+                    }
                 </div>
             </div>
         </div>
