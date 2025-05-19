@@ -161,25 +161,25 @@ namespace DehaAccountingMvc.Controllers
             Console.WriteLine("=============== PURCHASE ORDER CREATE ===============");
             Console.WriteLine($"SupplierId: {purchaseOrder.SupplierId}");
             Console.WriteLine($"Products count: {productId?.Length ?? 0}");
-            
+
             // Xóa lỗi productId nếu có trong ModelState
             if (ModelState.ContainsKey("productId"))
             {
                 ModelState.Remove("productId");
             }
-            
+
             if (productId == null || productId.Length == 0)
             {
                 ModelState.AddModelError("", "Chưa có sản phẩm nào trong đơn hàng");
                 Console.WriteLine("Lỗi: Chưa có sản phẩm nào trong đơn hàng");
             }
-            
+
             if (purchaseOrder.SupplierId <= 0)
             {
                 ModelState.AddModelError("SupplierId", "Vui lòng chọn nhà cung cấp");
                 Console.WriteLine("Lỗi: Chưa chọn nhà cung cấp");
             }
-            
+
             // Debug - ghi log ModelState
             foreach (var state in ModelState)
             {
@@ -191,7 +191,7 @@ namespace DehaAccountingMvc.Controllers
                     }
                 }
             }
-            
+
             if (ModelState.IsValid)
             {
                 try
@@ -244,7 +244,7 @@ namespace DehaAccountingMvc.Controllers
 
                     _context.Add(purchaseOrder);
                     await _context.SaveChangesAsync();
-                    
+
                     TempData["SuccessMessage"] = "Đã tạo đơn mua hàng thành công";
                     return RedirectToAction(nameof(Index));
                 }

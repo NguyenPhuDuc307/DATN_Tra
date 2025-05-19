@@ -29,60 +29,60 @@ public class HomeController : Controller
             ViewBag.CustomerCount = await _context.Customers.CountAsync();
             ViewBag.SupplierCount = await _context.Suppliers.CountAsync();
             ViewBag.SalesOrderCount = await _context.SalesOrders.CountAsync();
-            
+
             // Tính tổng doanh thu từ các đơn hàng đã xác nhận hoặc hoàn thành
             ViewBag.TotalRevenue = await _context.SalesOrders
                 .Where(so => so.Status != SalesOrderStatus.Draft && so.Status != SalesOrderStatus.Cancelled)
                 .SumAsync(so => so.GrandTotal);
-                
+
             // Tính tổng chi phí từ các đơn mua hàng đã xác nhận hoặc hoàn thành
             ViewBag.TotalExpenses = await _context.PurchaseOrders
                 .Where(po => po.Status != PurchaseOrderStatus.Cancelled)
                 .SumAsync(po => po.GrandTotal);
-            
+
             // Tính toán phần trăm thay đổi doanh thu và chi phí theo tháng
             var currentMonth = DateTime.Now;
             var lastMonth = currentMonth.AddMonths(-1);
-            
+
             // Doanh thu tháng này
             var currentMonthRevenue = await _context.SalesOrders
-                .Where(so => so.Status != SalesOrderStatus.Draft && 
+                .Where(so => so.Status != SalesOrderStatus.Draft &&
                        so.Status != SalesOrderStatus.Cancelled &&
                        so.OrderDate.Month == currentMonth.Month &&
                        so.OrderDate.Year == currentMonth.Year)
                 .SumAsync(so => so.GrandTotal);
-            
+
             // Doanh thu tháng trước
             var lastMonthRevenue = await _context.SalesOrders
-                .Where(so => so.Status != SalesOrderStatus.Draft && 
+                .Where(so => so.Status != SalesOrderStatus.Draft &&
                        so.Status != SalesOrderStatus.Cancelled &&
                        so.OrderDate.Month == lastMonth.Month &&
                        so.OrderDate.Year == lastMonth.Year)
                 .SumAsync(so => so.GrandTotal);
-                
+
             // Tính phần trăm thay đổi doanh thu
-            ViewBag.RevenueChangePercent = lastMonthRevenue > 0 
-                ? (int)((currentMonthRevenue - lastMonthRevenue) * 100 / lastMonthRevenue) 
+            ViewBag.RevenueChangePercent = lastMonthRevenue > 0
+                ? (int)((currentMonthRevenue - lastMonthRevenue) * 100 / lastMonthRevenue)
                 : 0;
             ViewBag.RevenueIncreased = currentMonthRevenue >= lastMonthRevenue;
-                
+
             // Chi phí tháng này
             var currentMonthExpenses = await _context.PurchaseOrders
                 .Where(po => po.Status != PurchaseOrderStatus.Cancelled &&
                        po.OrderDate.Month == currentMonth.Month &&
                        po.OrderDate.Year == currentMonth.Year)
                 .SumAsync(po => po.GrandTotal);
-            
+
             // Chi phí tháng trước
             var lastMonthExpenses = await _context.PurchaseOrders
                 .Where(po => po.Status != PurchaseOrderStatus.Cancelled &&
                        po.OrderDate.Month == lastMonth.Month &&
                        po.OrderDate.Year == lastMonth.Year)
                 .SumAsync(po => po.GrandTotal);
-                
+
             // Tính phần trăm thay đổi chi phí
-            ViewBag.ExpensesChangePercent = lastMonthExpenses > 0 
-                ? (int)((currentMonthExpenses - lastMonthExpenses) * 100 / lastMonthExpenses) 
+            ViewBag.ExpensesChangePercent = lastMonthExpenses > 0
+                ? (int)((currentMonthExpenses - lastMonthExpenses) * 100 / lastMonthExpenses)
                 : 0;
             ViewBag.ExpensesDecreased = currentMonthExpenses <= lastMonthExpenses;
 

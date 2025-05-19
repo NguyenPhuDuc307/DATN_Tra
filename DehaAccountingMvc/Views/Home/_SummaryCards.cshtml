@@ -4,7 +4,7 @@
     var totalProducts = ViewBag.ProductCount ?? 0;
     var totalCustomers = ViewBag.CustomerCount ?? 0;
     var totalSuppliers = ViewBag.SupplierCount ?? 0;
-    
+
     // Lấy số lượng đơn hàng
     var salesOrderCount = ViewBag.SalesOrderCount ?? 0;
 
@@ -124,10 +124,13 @@
                 </div>
                 <hr>
                 <div class="small @(ViewBag.RevenueIncreased ? "text-success" : "text-danger")">
-                    @if(ViewBag.RevenueIncreased) {
+                    @if (ViewBag.RevenueIncreased)
+                    {
                         <i class="bi bi-arrow-up-right text-success me-1"></i>
                         <span>Tăng @Math.Abs(ViewBag.RevenueChangePercent)% so với tháng trước</span>
-                    } else {
+                    }
+                    else
+                    {
                         <i class="bi bi-arrow-down-right text-danger me-1"></i>
                         <span>Giảm @Math.Abs(ViewBag.RevenueChangePercent)% so với tháng trước</span>
                     }
@@ -151,10 +154,13 @@
                 </div>
                 <hr>
                 <div class="small @(ViewBag.ExpensesDecreased ? "text-success" : "text-danger")">
-                    @if(ViewBag.ExpensesDecreased) {
+                    @if (ViewBag.ExpensesDecreased)
+                    {
                         <i class="bi bi-arrow-down-right text-success me-1"></i>
                         <span>Giảm @Math.Abs(ViewBag.ExpensesChangePercent)% so với tháng trước</span>
-                    } else {
+                    }
+                    else
+                    {
                         <i class="bi bi-arrow-up-right text-danger me-1"></i>
                         <span>Tăng @Math.Abs(ViewBag.ExpensesChangePercent)% so với tháng trước</span>
                     }
@@ -188,3 +194,4 @@
         </div>
     </div>
 </div>
+           

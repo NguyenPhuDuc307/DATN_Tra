@@ -32,7 +32,8 @@
                                 <span asp-validation-for="Name" class="text-danger"></span>
                             </div>
                             <div class="mb-3">
-                                <label asp-for="ProductCategoryId" class="form-label">Danh mục sản phẩm <span class="text-danger">*</span></label>
+                                <label asp-for="ProductCategoryId" class="form-label">Danh mục sản phẩm <span
+                                        class="text-danger">*</span></label>
                                 <select name="ProductCategoryId" id="ProductCategoryId" class="form-select" required>
                                     <option value="">-- Chọn danh mục --</option>
                                     @foreach (var item in (SelectList)ViewBag.ProductCategories)
@@ -41,7 +42,8 @@
                                     }
                                 </select>
                                 <span asp-validation-for="ProductCategoryId" class="text-danger"></span>
-                                <div id="categoryError" class="text-danger" style="display: none;">Vui lòng chọn danh mục sản phẩm</div>
+                                <div id="categoryError" class="text-danger" style="display: none;">Vui lòng chọn danh
+                                    mục sản phẩm</div>
                             </div>
                             <div class="mb-3">
                                 <label asp-for="SupplierId" class="form-label">Nhà cung cấp</label>
@@ -162,13 +164,13 @@
                     $("#defaultSupplierId").val(selectedValue);
                 }
             });
-            
+
             // Kiểm tra và xử lý form submit
-            $("form").submit(function(e) {
+            $("form").submit(function (e) {
                 // Xác thực danh mục sản phẩm
                 var categoryId = $("#ProductCategoryId").val();
                 console.log("Selected category ID:", categoryId);
-                
+
                 if (!categoryId || categoryId === "" || categoryId === "0") {
                     $("#categoryError").show();
                     alert("Vui lòng chọn danh mục sản phẩm!");
@@ -177,41 +179,41 @@
                     return false;
                 } else {
                     $("#categoryError").hide();
-                    
+
                     // Đảm bảo select dropdown có giá trị đúng trước khi submit
                     // Điều này giúp tránh việc gửi cả giá trị từ dropdown và từ hidden field
                     console.log("Setting final category ID in dropdown:", categoryId);
                     $("#ProductCategoryId").val(categoryId);
                 }
-                
+
                 // Xác thực các trường bắt buộc khác
                 var productCode = $("#ProductCode").val();
                 var productName = $("#Name").val();
-                
+
                 if (!productCode || productCode.trim() === "") {
                     alert("Vui lòng nhập mã sản phẩm!");
                     $("#ProductCode").focus();
                     e.preventDefault();
                     return false;
                 }
-                
+
                 if (!productName || productName.trim() === "") {
                     alert("Vui lòng nhập tên sản phẩm!");
                     $("#Name").focus();
                     e.preventDefault();
                     return false;
                 }
-                
+
                 // Không cần thêm hidden field vì đã có select element, tránh giá trị bị gửi dưới dạng "1,1"
                 // Chỉ cần đảm bảo giá trị categoryId được chọn trong dropdown
                 $("#ProductCategoryId").val(categoryId);
-                
+
                 // Ghi log form data
                 console.log("Form submitting with data:");
                 console.log("ProductCode:", productCode);
                 console.log("Name:", productName);
                 console.log("ProductCategoryId:", categoryId);
-                
+
                 return true;
             });
         });

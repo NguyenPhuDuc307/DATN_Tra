@@ -95,25 +95,25 @@ namespace DehaAccountingMvc.Controllers
             Console.WriteLine("=============== SALES ORDER CREATE ===============");
             Console.WriteLine($"CustomerId: {salesOrder.CustomerId}");
             Console.WriteLine($"Products count: {productId?.Length ?? 0}");
-            
+
             // Xóa lỗi productId nếu có trong ModelState
             if (ModelState.ContainsKey("productId"))
             {
                 ModelState.Remove("productId");
             }
-            
+
             if (productId == null || productId.Length == 0)
             {
                 ModelState.AddModelError("", "Chưa có sản phẩm nào trong đơn hàng");
                 Console.WriteLine("Lỗi: Chưa có sản phẩm nào trong đơn hàng");
             }
-            
+
             if (salesOrder.CustomerId <= 0)
             {
                 ModelState.AddModelError("CustomerId", "Vui lòng chọn khách hàng");
                 Console.WriteLine("Lỗi: Chưa chọn khách hàng");
             }
-            
+
             // Debug - ghi log ModelState
             foreach (var state in ModelState)
             {
@@ -125,7 +125,7 @@ namespace DehaAccountingMvc.Controllers
                     }
                 }
             }
-            
+
             if (ModelState.IsValid)
             {
                 try
@@ -175,7 +175,7 @@ namespace DehaAccountingMvc.Controllers
 
                     _context.Add(salesOrder);
                     await _context.SaveChangesAsync();
-                    
+
                     TempData["SuccessMessage"] = "Đã tạo đơn hàng thành công";
                     return RedirectToAction(nameof(Index));
                 }

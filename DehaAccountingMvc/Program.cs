@@ -7,7 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite(connectionString));
+    options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options =>
@@ -41,17 +41,15 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();
-    app.UseDeveloperExceptionPage();
-
-    // Seed database khi ở môi trường phát triển
+    app.UseDeveloperExceptionPage();    // Seed database khi ở môi trường phát triển
     using (var scope = app.Services.CreateScope())
     {
         var services = scope.ServiceProvider;
         try
         {
             var context = services.GetRequiredService<ApplicationDbContext>();
-            // Đảm bảo database được tạo
-            context.Database.EnsureCreated();
+            // Áp dụng migration thay vì chỉ đảm bảo database được tạo
+            context.Database.Migrate();
             // Thêm seed data
             context.Seed();
 
